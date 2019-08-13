@@ -1,10 +1,6 @@
 # CSBEF.Module.UserManagement
 It is a user management module developed for CSBEF structure.
 
-
-# CSBEF.Module.UserManagement
-It is a user management module developed for CSBEF structure.
-
 # Nuget
 https://www.nuget.org/packages/CSBEF.Module.UserManagement/
 
