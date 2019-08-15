@@ -1,9 +1,6 @@
 # CSBEF.Module.UserManagement
 It is a user management module developed for CSBEF structure.
 
-# Nuget
-https://www.nuget.org/packages/CSBEF.Module.UserManagement/
-
 # Very Soon
 I am preparing a comprehensive documentation of the project. But since I developed it alone, I cannot do everything at the same time :) So I will finish the documentation as soon as possible and publish it here.
 
