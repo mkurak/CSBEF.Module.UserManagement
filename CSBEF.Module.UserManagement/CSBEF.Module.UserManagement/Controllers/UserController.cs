@@ -328,6 +328,225 @@ namespace CSBEF.Module.UserManagement.Controllers
             return Ok(rtn);
         }
 
+        [Route("api/UserManagement/User/ListWithDetails")]
+        [HttpGet]
+        public async Task<ActionResult<IReturnModel<IList<UserDetailsModel>>>> ListWithDetails([FromQuery]ActionFilterModel filter)
+        {
+            #region Declares
+
+            IReturnModel<IList<UserDetailsModel>> rtn = new ReturnModel<IList<UserDetailsModel>>(_logger);
+
+            #endregion Declares
+
+            #region Hash Control
+
+            if (!filter.HashControl(_configuration["AppSettings:HashSecureKeys:UserManagement:UserController:ListWithDetails"]))
+            {
+                _logger.LogError("InvalidHash: " + filter.Hash);
+                return BadRequest(rtn.SendError(GlobalErrors.HashCodeInValid));
+            }
+
+            #endregion Hash Control
+
+            #region Action Body
+
+            try
+            {
+                var userId = Tools.GetTokenNameClaim(HttpContext);
+                var tokenId = Tools.GetTokenIdClaim(HttpContext);
+                var serviceFilterModel = new ServiceParamsWithIdentifier<ActionFilterModel>(filter, userId, tokenId);
+                IReturnModel<IList<UserDetailsModel>> serviceAction = await _service.ListWithDetails(serviceFilterModel);
+                if (serviceAction.Error.Status)
+                    rtn.Error = serviceAction.Error;
+                else
+                    rtn.Result = serviceAction.Result;
+            }
+            catch (Exception ex)
+            {
+                rtn = rtn.SendError(GlobalErrors.TechnicalError, ex);
+            }
+
+            #endregion Action Body
+
+            return Ok(rtn);
+        }
+
+        [Authorize(Roles = "Root, Root.UserManagement, Root.UserManagement.User, Root.UserManagement.User.Add, Root.UserManagement.User.Update")]
+        [Route("api/UserManagement/User/Save")]
+        [HttpPost]
+        public async Task<ActionResult<IReturnModel<UserDTO>>> Save([FromBody]SaveUserModel filter)
+        {
+            #region Declares
+
+            IReturnModel<UserDTO> rtn = new ReturnModel<UserDTO>(_logger);
+
+            #endregion Declares
+
+            #region Hash Control
+
+            if (!filter.HashControl(_configuration["AppSettings:HashSecureKeys:UserManagement:UserController:Save"]))
+            {
+                _logger.LogError("InvalidHash: " + filter.Hash);
+                return BadRequest(rtn.SendError(GlobalErrors.HashCodeInValid));
+            }
+
+            #endregion Hash Control
+
+            #region Action Body
+
+            try
+            {
+                var userId = Tools.GetTokenNameClaim(HttpContext);
+                var tokenId = Tools.GetTokenIdClaim(HttpContext);
+                var serviceFilterModel = new ServiceParamsWithIdentifier<SaveUserModel>(filter, userId, tokenId);
+                IReturnModel<UserDTO> serviceAction = await _service.Save(serviceFilterModel);
+                if (serviceAction.Error.Status)
+                    rtn.Error = serviceAction.Error;
+                else
+                    rtn.Result = serviceAction.Result;
+            }
+            catch (Exception ex)
+            {
+                rtn = rtn.SendError(GlobalErrors.TechnicalError, ex);
+            }
+
+            #endregion Action Body
+
+            return Ok(rtn);
+        }
+
+        [Authorize(Roles = "Root, Root.UserManagement, Root.UserManagement.User, Root.UserManagement.User.ChangeStatus")]
+        [Route("api/UserManagement/User/ChangeStatus")]
+        [HttpPost]
+        public async Task<ActionResult<IReturnModel<bool>>> ChangeStatus([FromBody]ChangeStatusModel filter)
+        {
+            #region Declares
+
+            IReturnModel<bool> rtn = new ReturnModel<bool>(_logger);
+
+            #endregion Declares
+
+            #region Hash Control
+
+            if (!filter.HashControl(_configuration["AppSettings:HashSecureKeys:UserManagement:UserController:ChangeStatus"]))
+            {
+                _logger.LogError("InvalidHash: " + filter.Hash);
+                return BadRequest(rtn.SendError(GlobalErrors.HashCodeInValid));
+            }
+
+            #endregion Hash Control
+
+            #region Action Body
+
+            try
+            {
+                var userId = Tools.GetTokenNameClaim(HttpContext);
+                var tokenId = Tools.GetTokenIdClaim(HttpContext);
+                var serviceFilterModel = new ServiceParamsWithIdentifier<ChangeStatusModel>(filter, userId, tokenId);
+                IReturnModel<bool> serviceAction = await _service.ChangeStatus(serviceFilterModel);
+                if (serviceAction.Error.Status)
+                    rtn.Error = serviceAction.Error;
+                else
+                    rtn.Result = serviceAction.Result;
+            }
+            catch (Exception ex)
+            {
+                rtn = rtn.SendError(GlobalErrors.TechnicalError, ex);
+            }
+
+            #endregion Action Body
+
+            return Ok(rtn);
+        }
+
+        [Authorize(Roles = "Root, Root.UserManagement, Root.UserManagement.User, Root.UserManagement.User.UserInGroup")]
+        [Route("api/UserManagement/User/SaveUserInGroups")]
+        [HttpPost]
+        public async Task<ActionResult<IReturnModel<bool>>> SaveUserInGroups([FromBody]SaveUserInGroupsModel filter)
+        {
+            #region Declares
+
+            IReturnModel<bool> rtn = new ReturnModel<bool>(_logger);
+
+            #endregion Declares
+
+            #region Hash Control
+
+            if (!filter.HashControl(_configuration["AppSettings:HashSecureKeys:UserManagement:UserController:SaveUserInGroups"]))
+            {
+                _logger.LogError("InvalidHash: " + filter.Hash);
+                return BadRequest(rtn.SendError(GlobalErrors.HashCodeInValid));
+            }
+
+            #endregion Hash Control
+
+            #region Action Body
+
+            try
+            {
+                var userId = Tools.GetTokenNameClaim(HttpContext);
+                var tokenId = Tools.GetTokenIdClaim(HttpContext);
+                var serviceFilterModel = new ServiceParamsWithIdentifier<SaveUserInGroupsModel>(filter, userId, tokenId);
+                IReturnModel<bool> serviceAction = await _service.SaveUserInGroups(serviceFilterModel);
+                if (serviceAction.Error.Status)
+                    rtn.Error = serviceAction.Error;
+                else
+                    rtn.Result = serviceAction.Result;
+            }
+            catch (Exception ex)
+            {
+                rtn = rtn.SendError(GlobalErrors.TechnicalError, ex);
+            }
+
+            #endregion Action Body
+
+            return Ok(rtn);
+        }
+
+        [Authorize(Roles = "Root, Root.UserManagement, Root.UserManagement.User, Root.UserManagement.User.ChangeRoles")]
+        [Route("api/UserManagement/User/SaveUserInRoles")]
+        [HttpPost]
+        public async Task<ActionResult<IReturnModel<bool>>> SaveUserInRoles([FromBody]SaveUserInRolesModel filter)
+        {
+            #region Declares
+
+            IReturnModel<bool> rtn = new ReturnModel<bool>(_logger);
+
+            #endregion Declares
+
+            #region Hash Control
+
+            if (!filter.HashControl(_configuration["AppSettings:HashSecureKeys:UserManagement:UserController:SaveUserInRoles"]))
+            {
+                _logger.LogError("InvalidHash: " + filter.Hash);
+                return BadRequest(rtn.SendError(GlobalErrors.HashCodeInValid));
+            }
+
+            #endregion Hash Control
+
+            #region Action Body
+
+            try
+            {
+                var userId = Tools.GetTokenNameClaim(HttpContext);
+                var tokenId = Tools.GetTokenIdClaim(HttpContext);
+                var serviceFilterModel = new ServiceParamsWithIdentifier<SaveUserInRolesModel>(filter, userId, tokenId);
+                IReturnModel<bool> serviceAction = await _service.SaveUserInRoles(serviceFilterModel);
+                if (serviceAction.Error.Status)
+                    rtn.Error = serviceAction.Error;
+                else
+                    rtn.Result = serviceAction.Result;
+            }
+            catch (Exception ex)
+            {
+                rtn = rtn.SendError(GlobalErrors.TechnicalError, ex);
+            }
+
+            #endregion Action Body
+
+            return Ok(rtn);
+        }
+
         #endregion Actions
     }
 }

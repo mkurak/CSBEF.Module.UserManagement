@@ -79,6 +79,14 @@ namespace CSBEF.Module.UserManagement
 
             #endregion UserForCurrentUser
 
+            #region GroupDTO > UserGroupDetailsModel
+
+            CreateMap<GroupDTO, UserGroupDetailsModel>()
+                .ForMember(x => x.Roles, opt => opt.Ignore())
+                .ForMember(x => x.Users, opt => opt.Ignore());
+
+            #endregion GroupDTO > UserGroupDetailsModel
+
             #endregion Other
         }
     }

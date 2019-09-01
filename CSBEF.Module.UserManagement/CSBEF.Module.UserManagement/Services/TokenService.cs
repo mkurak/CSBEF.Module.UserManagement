@@ -249,8 +249,8 @@ namespace CSBEF.Module.UserManagement.Services
                     key = Encoding.ASCII.GetBytes(_configuration["AppSettings:JWTSettings:SecretCode"]);
                     tokenDescriptor = new SecurityTokenDescriptor
                     {
-                        Audience = "CSNTC",
-                        Issuer = "JWT.CSNTC",
+                        Audience = "CSBEF",
+                        Issuer = "JWT.CSBEF",
                         Subject = new ClaimsIdentity(new Claim[] {
                         new Claim(ClaimTypes.Name, getUser.Id.ToString()),
                         new Claim(ClaimTypes.Email, getUser.Email),

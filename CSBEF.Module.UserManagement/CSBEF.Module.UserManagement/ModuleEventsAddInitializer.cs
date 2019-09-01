@@ -58,20 +58,24 @@ namespace CSBEF.Module.UserManagement
             #region Service Actions
 
             eventService.AddEvent("UserService.UserListForCurrentUser.Before", "UserManagement", "UserService", "UserListForCurrentUser", EventTypeEnum.before);
-
-            eventService.AddEvent("UserService.UserListForCurrentUser.After", "UserManagement", "UserService", "UserListForCurrentUser", EventTypeEnum.after);
-
-            #endregion
-
-            #region Service Actions
-
             eventService.AddEvent("UserService.ChangePassword.Before", "UserManagement", "UserService", "ChangePassword", EventTypeEnum.before);
             eventService.AddEvent("UserService.ChangePicture.Before", "UserManagement", "UserService", "ChangePicture", EventTypeEnum.before);
             eventService.AddEvent("UserService.ChangeBgPicture.Before", "UserManagement", "UserService", "ChangeBgPicture", EventTypeEnum.before);
+            eventService.AddEvent("UserService.ListWithDetails.Before", "UserManagement", "UserService", "ListWithDetails", EventTypeEnum.before);
+            eventService.AddEvent("UserService.Save.Before", "UserManagement", "UserService", "Save", EventTypeEnum.before);
+            eventService.AddEvent("UserService.ChangeStatus.Before", "UserManagement", "UserService", "ChangeStatus", EventTypeEnum.before);
+            eventService.AddEvent("UserService.SaveUserInGroups.Before", "UserManagement", "UserService", "SaveUserInGroups", EventTypeEnum.before);
+            eventService.AddEvent("UserService.SaveUserInRoles.Before", "UserManagement", "UserService", "SaveUserInRoles", EventTypeEnum.before);
 
             eventService.AddEvent("UserService.ChangePassword.After", "UserManagement", "UserService", "ChangePassword", EventTypeEnum.after);
             eventService.AddEvent("UserService.ChangePicture.After", "UserManagement", "UserService", "ChangePicture", EventTypeEnum.after);
             eventService.AddEvent("UserService.ChangeBgPicture.After", "UserManagement", "UserService", "ChangeBgPicture", EventTypeEnum.after);
+            eventService.AddEvent("UserService.UserListForCurrentUser.After", "UserManagement", "UserService", "UserListForCurrentUser", EventTypeEnum.after);
+            eventService.AddEvent("UserService.ListWithDetails.After", "UserManagement", "UserService", "ListWithDetails", EventTypeEnum.after);
+            eventService.AddEvent("UserService.Save.After", "UserManagement", "UserService", "Save", EventTypeEnum.after);
+            eventService.AddEvent("UserService.ChangeStatus.After", "UserManagement", "UserService", "ChangeStatus", EventTypeEnum.after);
+            eventService.AddEvent("UserService.SaveUserInGroups.After", "UserManagement", "UserService", "SaveUserInGroups", EventTypeEnum.after);
+            eventService.AddEvent("UserService.SaveUserInRoles.After", "UserManagement", "UserService", "SaveUserInRoles", EventTypeEnum.after);
 
             #endregion Service Actions
 
@@ -102,6 +106,86 @@ namespace CSBEF.Module.UserManagement
             #endregion Service Actions
 
             #endregion UserMessageService
+
+            #region TokenService
+
+            #region Base Actions
+
+            eventService.AddEvent("RoleService.FirstAsync.Before", "UserManagement", "RoleService", "FirstAsync", EventTypeEnum.before);
+            eventService.AddEvent("RoleService.FirstOrDefaultAsync.Before", "UserManagement", "RoleService", "FirstOrDefaultAsync", EventTypeEnum.before);
+            eventService.AddEvent("RoleService.AnyAsync.Before", "UserManagement", "RoleService", "AnyAsync", EventTypeEnum.before);
+            eventService.AddEvent("RoleService.ListAsync.Before", "UserManagement", "RoleService", "ListAsync", EventTypeEnum.before);
+
+            eventService.AddEvent("RoleService.FirstAsync.After", "UserManagement", "RoleService", "FirstAsync", EventTypeEnum.after);
+            eventService.AddEvent("RoleService.FirstOrDefaultAsync.After", "UserManagement", "RoleService", "FirstOrDefaultAsync", EventTypeEnum.after);
+            eventService.AddEvent("RoleService.AnyAsync.After", "UserManagement", "RoleService", "AnyAsync", EventTypeEnum.after);
+            eventService.AddEvent("RoleService.ListAsync.After", "UserManagement", "RoleService", "ListAsync", EventTypeEnum.after);
+
+            #endregion Base Actions
+
+            #region Service Actions
+
+
+
+            #endregion Service Actions
+
+            #endregion TokenService
+
+            #region RoleService
+
+            #region Base Actions
+
+            eventService.AddEvent("RoleService.FirstAsync.Before", "UserManagement", "RoleService", "FirstAsync", EventTypeEnum.before);
+            eventService.AddEvent("RoleService.FirstOrDefaultAsync.Before", "UserManagement", "RoleService", "FirstOrDefaultAsync", EventTypeEnum.before);
+            eventService.AddEvent("RoleService.AnyAsync.Before", "UserManagement", "RoleService", "AnyAsync", EventTypeEnum.before);
+            eventService.AddEvent("RoleService.ListAsync.Before", "UserManagement", "RoleService", "ListAsync", EventTypeEnum.before);
+
+            eventService.AddEvent("RoleService.FirstAsync.After", "UserManagement", "RoleService", "FirstAsync", EventTypeEnum.after);
+            eventService.AddEvent("RoleService.FirstOrDefaultAsync.After", "UserManagement", "RoleService", "FirstOrDefaultAsync", EventTypeEnum.after);
+            eventService.AddEvent("RoleService.AnyAsync.After", "UserManagement", "RoleService", "AnyAsync", EventTypeEnum.after);
+            eventService.AddEvent("RoleService.ListAsync.After", "UserManagement", "RoleService", "ListAsync", EventTypeEnum.after);
+
+            #endregion Base Actions
+
+            #region Service Actions
+
+
+
+            #endregion Service Actions
+
+            #endregion RoleService
+
+            #region GroupService
+
+            #region Base Actions
+
+            eventService.AddEvent("GroupService.FirstAsync.Before", "UserManagement", "GroupService", "FirstAsync", EventTypeEnum.before);
+            eventService.AddEvent("GroupService.FirstOrDefaultAsync.Before", "UserManagement", "GroupService", "FirstOrDefaultAsync", EventTypeEnum.before);
+            eventService.AddEvent("GroupService.AnyAsync.Before", "UserManagement", "GroupService", "AnyAsync", EventTypeEnum.before);
+            eventService.AddEvent("GroupService.ListAsync.Before", "UserManagement", "GroupService", "ListAsync", EventTypeEnum.before);
+
+            eventService.AddEvent("GroupService.FirstAsync.After", "UserManagement", "GroupService", "FirstAsync", EventTypeEnum.after);
+            eventService.AddEvent("GroupService.FirstOrDefaultAsync.After", "UserManagement", "GroupService", "FirstOrDefaultAsync", EventTypeEnum.after);
+            eventService.AddEvent("GroupService.AnyAsync.After", "UserManagement", "GroupService", "AnyAsync", EventTypeEnum.after);
+            eventService.AddEvent("GroupService.ListAsync.After", "UserManagement", "GroupService", "ListAsync", EventTypeEnum.after);
+
+            #endregion Base Actions
+
+            #region Service Actions
+
+            eventService.AddEvent("GroupService.ListWithDetails.Before", "UserManagement", "GroupService", "ListWithDetails", EventTypeEnum.before);
+            eventService.AddEvent("GroupService.Save.Before", "UserManagement", "GroupService", "Save", EventTypeEnum.before);
+            eventService.AddEvent("GroupService.ChangeStatus.Before", "UserManagement", "GroupService", "ChangeStatus", EventTypeEnum.before);
+            eventService.AddEvent("GroupService.SaveGroupInRoles.Before", "UserManagement", "GroupService", "SaveGroupInRoles", EventTypeEnum.before);
+
+            eventService.AddEvent("GroupService.ListWithDetails.After", "UserManagement", "GroupService", "ListWithDetails", EventTypeEnum.after);
+            eventService.AddEvent("GroupService.Save.After", "UserManagement", "GroupService", "Save", EventTypeEnum.after);
+            eventService.AddEvent("GroupService.ChangeStatus.After", "UserManagement", "GroupService", "ChangeStatus", EventTypeEnum.after);
+            eventService.AddEvent("GroupService.SaveGroupInRoles.After", "UserManagement", "GroupService", "SaveGroupInRoles", EventTypeEnum.after);
+
+            #endregion Service Actions
+
+            #endregion GroupService
         }
     }
 }

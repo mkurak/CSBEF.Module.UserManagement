@@ -29,6 +29,8 @@ namespace CSBEF.Module.UserManagement
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserMessageService, UserMessageService>();
+            services.AddScoped<IRoleService, RoleService>();
+            services.AddScoped<IGroupService, GroupService>();
 
             #endregion Services
         }

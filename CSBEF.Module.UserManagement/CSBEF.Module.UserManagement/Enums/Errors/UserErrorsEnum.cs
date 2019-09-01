@@ -9,6 +9,16 @@
         ChangePicture_UserNotFound,
         UserListForCurrentUser_UserNotFound,
         ChangeProfileInformations_ModelValidationFail,
-        ChangeProfileInformations_DataFound
+        ChangeProfileInformations_DataFound,
+        Save_ModelValidationFail,
+        Save_EmailExists,
+        Save_UserNameExists,
+        Save_UserNotFound,
+        Save_PasswordRequired,
+        Save_CurrentPasswordWrong,
+        ChangeStatus_ModelValidationFail,
+        ChangeStatus_DataNotFound,
+        SaveUserInGroups_ModelValidationFail,
+        SaveUserInRoles_ModelValidationFail
     }
 }
