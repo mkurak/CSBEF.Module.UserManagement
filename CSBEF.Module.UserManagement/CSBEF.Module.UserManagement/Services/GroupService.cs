@@ -1,26 +1,26 @@
 ﻿using AutoMapper;
+using CSBEF.Core.Abstracts;
+using CSBEF.Core.Concretes;
+using CSBEF.Core.Enums;
+using CSBEF.Core.Helpers;
+using CSBEF.Core.Interfaces;
+using CSBEF.Core.Models;
+using CSBEF.Core.Models.HubModels;
+using CSBEF.Module.UserManagement.Enums.Errors;
 using CSBEF.Module.UserManagement.Interfaces.Repository;
 using CSBEF.Module.UserManagement.Interfaces.Service;
 using CSBEF.Module.UserManagement.Models.DTO;
+using CSBEF.Module.UserManagement.Models.Request;
+using CSBEF.Module.UserManagement.Models.Return;
 using CSBEF.Module.UserManagement.Poco;
-using CSBEF.Core.Abstracts;
-using CSBEF.Core.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using CSBEF.Core.Concretes;
-using CSBEF.Core.Models;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using CSBEF.Module.UserManagement.Models.Return;
 using System;
-using CSBEF.Core.Enums;
-using System.Linq;
-using CSBEF.Module.UserManagement.Models.Request;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using CSBEF.Core.Helpers;
-using CSBEF.Module.UserManagement.Enums.Errors;
-using CSBEF.Core.Models.HubModels;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace CSBEF.Module.UserManagement.Services
 {
@@ -33,7 +33,7 @@ namespace CSBEF.Module.UserManagement.Services
         private ITokenRepository _tokenRepository;
         private IHubSyncDataService _hubSyncDataService;
 
-        #endregion
+        #endregion Dependencies
 
         #region ctor
 
@@ -126,7 +126,7 @@ namespace CSBEF.Module.UserManagement.Services
 
                 if (cnt)
                 {
-                    foreach(var item in getList.Result)
+                    foreach (var item in getList.Result)
                     {
                         newItem = new UserGroupDetailsModel();
                         newItem = _mapper.Map<UserGroupDetailsModel>(item);
@@ -134,7 +134,7 @@ namespace CSBEF.Module.UserManagement.Services
                         getRoles = await _groupInRoleRepository.FindAllAsync(i => i.GroupId == item.Id);
                         if (getRoles.Any())
                         {
-                            foreach(var inRole in getRoles)
+                            foreach (var inRole in getRoles)
                                 newItem.Roles.Add(inRole.RoleId);
                         }
 
@@ -264,10 +264,10 @@ namespace CSBEF.Module.UserManagement.Services
 
                 if (cnt)
                 {
-                    if(args.Param.Id == 0)
+                    if (args.Param.Id == 0)
                     {
                         checkName = await Repository.FindAsync(i => i.GroupName == args.Param.GroupName);
-                        if(checkName != null)
+                        if (checkName != null)
                         {
                             rtn = rtn.SendError(GroupErrorsEnum.Save_GroupNameExists);
                             cnt = false;
@@ -286,7 +286,7 @@ namespace CSBEF.Module.UserManagement.Services
 
                 if (cnt)
                 {
-                    if(getData == null)
+                    if (getData == null)
                     {
                         getData = new Group
                         {
@@ -461,7 +461,7 @@ namespace CSBEF.Module.UserManagement.Services
                     getUsers = await _userInGroupRepository.FindAllAsync(i => i.GroupId == args.Param.Id);
                     if (getUsers.Any())
                     {
-                        foreach(var user in getUsers)
+                        foreach (var user in getUsers)
                         {
                             tokens = await _tokenRepository.FindAllAsync(i => i.UserId == user.Id);
                             if (tokens.Any())
@@ -486,13 +486,13 @@ namespace CSBEF.Module.UserManagement.Services
                         var relationUsers = await _userInGroupRepository.FindAllAsync(i => i.GroupId == args.Param.Id);
                         if (relationUsers.Any())
                         {
-                            foreach(var item in relationUsers)
+                            foreach (var item in relationUsers)
                             {
                                 _userInGroupRepository.Delete(item);
                                 var getTokens = await _tokenRepository.FindAllAsync(i => i.UserId == item.UserId);
                                 if (getTokens.Any())
                                 {
-                                    foreach(var token in getTokens)
+                                    foreach (var token in getTokens)
                                     {
                                         token.Status = false;
                                         token.UpdatingDate = DateTime.Now;
@@ -632,7 +632,7 @@ namespace CSBEF.Module.UserManagement.Services
                     inRoleRecords = await _groupInRoleRepository.FindAllAsync(i => i.GroupId == args.Param.GroupId);
                     if (inRoleRecords.Any())
                     {
-                        foreach(var data in inRoleRecords)
+                        foreach (var data in inRoleRecords)
                             _groupInRoleRepository.Delete(data);
 
                         await _groupInRoleRepository.SaveAsync();
@@ -641,11 +641,11 @@ namespace CSBEF.Module.UserManagement.Services
                     if (!string.IsNullOrWhiteSpace(args.Param.Roles))
                     {
                         rolesArray = args.Param.Roles.Split(",");
-                        if(rolesArray.Length > 0)
+                        if (rolesArray.Length > 0)
                         {
-                            foreach(var data in rolesArray)
+                            foreach (var data in rolesArray)
                             {
-                                if(data.ToInt(0) > 0)
+                                if (data.ToInt(0) > 0)
                                 {
                                     _groupInRoleRepository.Add(new GroupInRole
                                     {
@@ -667,12 +667,12 @@ namespace CSBEF.Module.UserManagement.Services
                     findUsers = await _userInGroupRepository.FindAllAsync(i => i.GroupId == args.Param.GroupId);
                     if (findUsers.Any())
                     {
-                        foreach(var user in findUsers)
+                        foreach (var user in findUsers)
                         {
                             findTokens = await _tokenRepository.FindAllAsync(i => i.UserId == user.Id && i.Status == true);
                             if (findTokens.Any())
                             {
-                                foreach(var token in findTokens)
+                                foreach (var token in findTokens)
                                 {
                                     token.Status = false;
                                     token.UpdatingDate = DateTime.Now;

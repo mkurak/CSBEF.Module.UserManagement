@@ -1,11 +1,4 @@
 ﻿using AutoMapper;
-using CSBEF.Module.UserManagement.Enums.Errors;
-using CSBEF.Module.UserManagement.Interfaces.Repository;
-using CSBEF.Module.UserManagement.Interfaces.Service;
-using CSBEF.Module.UserManagement.Models.DTO;
-using CSBEF.Module.UserManagement.Models.Request;
-using CSBEF.Module.UserManagement.Models.Return;
-using CSBEF.Module.UserManagement.Poco;
 using CSBEF.Core.Abstracts;
 using CSBEF.Core.Concretes;
 using CSBEF.Core.Enums;
@@ -13,6 +6,14 @@ using CSBEF.Core.Helpers;
 using CSBEF.Core.Interfaces;
 using CSBEF.Core.Models;
 using CSBEF.Core.Models.HelperModels;
+using CSBEF.Core.Models.HubModels;
+using CSBEF.Module.UserManagement.Enums.Errors;
+using CSBEF.Module.UserManagement.Interfaces.Repository;
+using CSBEF.Module.UserManagement.Interfaces.Service;
+using CSBEF.Module.UserManagement.Models.DTO;
+using CSBEF.Module.UserManagement.Models.Request;
+using CSBEF.Module.UserManagement.Models.Return;
+using CSBEF.Module.UserManagement.Poco;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -22,7 +23,6 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using CSBEF.Core.Models.HubModels;
 
 namespace CSBEF.Module.UserManagement.Services
 {
@@ -30,14 +30,14 @@ namespace CSBEF.Module.UserManagement.Services
     {
         #region Dependencies
 
-        ITokenRepository _tokenRepository;
-        IUserMessageRepository _userMessageRepository;
-        IUserInGroupRepository _userInGroupRepository;
-        IGroupInRoleRepository _groupInRoleRepository;
-        IUserInRoleRepository _userInRoleRepository;
-        IHubSyncDataService _hubSyncDataService;
+        private ITokenRepository _tokenRepository;
+        private IUserMessageRepository _userMessageRepository;
+        private IUserInGroupRepository _userInGroupRepository;
+        private IGroupInRoleRepository _groupInRoleRepository;
+        private IUserInRoleRepository _userInRoleRepository;
+        private IHubSyncDataService _hubSyncDataService;
 
-        #endregion
+        #endregion Dependencies
 
         #region ctor
 
@@ -127,7 +127,7 @@ namespace CSBEF.Module.UserManagement.Services
                 if (cnt)
                 {
                     getUser = await Repository.FindAsync(i => i.Id == args.Param.UserId);
-                    if(getUser == null)
+                    if (getUser == null)
                     {
                         rtn = rtn.SendError(UserErrorsEnum.ChangePassword_UserNotFound);
                         cnt = false;
@@ -296,7 +296,8 @@ namespace CSBEF.Module.UserManagement.Services
 
                 if (cnt)
                 {
-                    await _hubSyncDataService.OnSync(new HubSyncDataModel<UserDetailsModel> {
+                    await _hubSyncDataService.OnSync(new HubSyncDataModel<UserDetailsModel>
+                    {
                         Key = "UserManagement_User",
                         ProcessType = "update",
                         Id = args.Param.Id,
@@ -575,7 +576,7 @@ namespace CSBEF.Module.UserManagement.Services
                         if (messages.Any())
                         {
                             var lastMessage = messages.Where(i => i.FromUserId == user.Id).OrderByDescending(i => i.AddingDate).FirstOrDefault();
-                            if(lastMessage != null)
+                            if (lastMessage != null)
                                 user.LastMessage = lastMessage.AddingDate;
 
                             foreach (var message in messages)
@@ -662,15 +663,18 @@ namespace CSBEF.Module.UserManagement.Services
             try
             {
                 #region Variables
+
                 bool cnt = true;
                 IReturnModel<bool> beforeEventHandler = null;
                 AfterEventParameterModel<IReturnModel<bool>, ServiceParamsWithIdentifier<ChangeProfileInformationsModel>> afterEventParameterModel = null;
                 IReturnModel<bool> afterEventHandler = null;
                 List<ValidationResult> modelValidation = null;
                 User getData = null;
-                #endregion
+
+                #endregion Variables
 
                 #region Before Event Handler
+
                 beforeEventHandler = await _eventService.GetEvent(ModuleName, $"{ServiceName}.ChangeProfileInformations.Before").EventHandler<bool, ServiceParamsWithIdentifier<ChangeProfileInformationsModel>>(args);
                 if (beforeEventHandler != null)
                 {
@@ -680,7 +684,8 @@ namespace CSBEF.Module.UserManagement.Services
                         cnt = false;
                     }
                 }
-                #endregion
+
+                #endregion Before Event Handler
 
                 #region Action Body
 
@@ -728,9 +733,10 @@ namespace CSBEF.Module.UserManagement.Services
 
                 rtn.Result = cnt;
 
-                #endregion
+                #endregion Action Body
 
                 #region After Event Handler
+
                 if (cnt)
                 {
                     afterEventParameterModel = new AfterEventParameterModel<IReturnModel<bool>, ServiceParamsWithIdentifier<ChangeProfileInformationsModel>>
@@ -756,16 +762,19 @@ namespace CSBEF.Module.UserManagement.Services
                         }
                     }
                 }
-                #endregion
+
+                #endregion After Event Handler
 
                 #region Clear Memory
+
                 args = null;
                 beforeEventHandler = null;
                 afterEventParameterModel = null;
                 afterEventHandler = null;
                 modelValidation = null;
                 getData = null;
-                #endregion
+
+                #endregion Clear Memory
             }
             catch (Exception ex)
             {
@@ -819,7 +828,7 @@ namespace CSBEF.Module.UserManagement.Services
 
                 if (cnt)
                 {
-                    foreach(var user in baseList.Result)
+                    foreach (var user in baseList.Result)
                     {
                         getUserDetails = await GetUserDetails(user.Id);
                         if (getUserDetails.Error.Status)
@@ -829,7 +838,7 @@ namespace CSBEF.Module.UserManagement.Services
                         }
                         else
                         {
-                            if(getUserDetails.Result != null)
+                            if (getUserDetails.Result != null)
                                 rtn.Result.Add(getUserDetails.Result);
                         }
                     }
@@ -937,12 +946,12 @@ namespace CSBEF.Module.UserManagement.Services
 
                 if (cnt)
                 {
-                    if(args.Param.Id > 0)
+                    if (args.Param.Id > 0)
                         checkEmail = await Repository.FindAsync(i => i.Email == args.Param.Email && i.Id != args.Param.Id);
                     else
                         checkEmail = await Repository.FindAsync(i => i.Email == args.Param.Email);
 
-                    if(checkEmail != null)
+                    if (checkEmail != null)
                     {
                         rtn = rtn.SendError(UserErrorsEnum.Save_EmailExists);
                         cnt = false;
@@ -951,12 +960,12 @@ namespace CSBEF.Module.UserManagement.Services
 
                 if (cnt)
                 {
-                    if(args.Param.Id > 0)
+                    if (args.Param.Id > 0)
                         checkUserName = await Repository.FindAsync(i => i.UserName == args.Param.UserName && i.Id != args.Param.Id);
                     else
                         checkUserName = await Repository.FindAsync(i => i.UserName == args.Param.UserName);
 
-                    if(checkUserName != null)
+                    if (checkUserName != null)
                     {
                         rtn = rtn.SendError(UserErrorsEnum.Save_UserNameExists);
                         cnt = false;
@@ -983,9 +992,9 @@ namespace CSBEF.Module.UserManagement.Services
                     getData.UpdatingUserId = args.UserId;
                 }
 
-                if(cnt && args.Param.Id > 0 && !string.IsNullOrWhiteSpace(args.Param.CurrentPassword))
+                if (cnt && args.Param.Id > 0 && !string.IsNullOrWhiteSpace(args.Param.CurrentPassword))
                 {
-                    if(getData.Password.ToUpper() != args.Param.CurrentPassword.ToUpper())
+                    if (getData.Password.ToUpper() != args.Param.CurrentPassword.ToUpper())
                     {
                         rtn = rtn.SendError(UserErrorsEnum.Save_CurrentPasswordWrong);
                         cnt = false;
@@ -996,13 +1005,13 @@ namespace CSBEF.Module.UserManagement.Services
                     }
                 }
 
-                if(cnt && args.Param.Id == 0 && string.IsNullOrWhiteSpace(args.Param.NewPassword))
+                if (cnt && args.Param.Id == 0 && string.IsNullOrWhiteSpace(args.Param.NewPassword))
                 {
                     rtn = rtn.SendError(UserErrorsEnum.Save_PasswordRequired);
                     cnt = false;
                 }
 
-                if(cnt && args.Param.Id == 0)
+                if (cnt && args.Param.Id == 0)
                 {
                     saveData = new User
                     {
@@ -1025,7 +1034,7 @@ namespace CSBEF.Module.UserManagement.Services
                     rtn.Result = _mapper.Map<UserDTO>(savedData);
                 }
 
-                if(cnt && args.Param.Id > 0)
+                if (cnt && args.Param.Id > 0)
                 {
                     savedData = Repository.Update(getData);
                     await Repository.SaveAsync();
@@ -1034,7 +1043,7 @@ namespace CSBEF.Module.UserManagement.Services
                     getTokens = await _tokenRepository.FindAllAsync(i => i.UserId == args.Param.Id);
                     if (getTokens.Any())
                     {
-                        foreach(var token in getTokens)
+                        foreach (var token in getTokens)
                         {
                             token.Status = false;
                             token.UpdatingDate = DateTime.Now;
@@ -1184,7 +1193,7 @@ namespace CSBEF.Module.UserManagement.Services
                     tokens = await _tokenRepository.FindAllAsync(i => i.UserId == args.Param.Id);
                     if (tokens.Any())
                     {
-                        foreach(var token in tokens)
+                        foreach (var token in tokens)
                         {
                             token.Status = false;
                             token.UpdatingDate = DateTime.Now;
@@ -1314,7 +1323,7 @@ namespace CSBEF.Module.UserManagement.Services
                     items = await _userInGroupRepository.FindAllAsync(i => i.UserId == args.Param.UserId);
                     if (items.Any())
                     {
-                        foreach(var item in items)
+                        foreach (var item in items)
                         {
                             _userInGroupRepository.Delete(item);
                         }
@@ -1326,10 +1335,10 @@ namespace CSBEF.Module.UserManagement.Services
 
                     if (groupsArray.Any())
                     {
-                        foreach(var group in groupsArray)
+                        foreach (var group in groupsArray)
                         {
                             var convertIntGroup = group.ToInt(0);
-                            if(convertIntGroup > 0)
+                            if (convertIntGroup > 0)
                             {
                                 _userInGroupRepository.Add(new UserInGroup
                                 {
@@ -1350,7 +1359,7 @@ namespace CSBEF.Module.UserManagement.Services
                     tokens = await _tokenRepository.FindAllAsync(i => i.UserId == args.Param.UserId);
                     if (tokens.Any())
                     {
-                        foreach(var token in tokens)
+                        foreach (var token in tokens)
                         {
                             token.Status = false;
                             token.UpdatingDate = DateTime.Now;
@@ -1626,7 +1635,7 @@ namespace CSBEF.Module.UserManagement.Services
                 #region Action Body
 
                 getData = await Repository.FindAsync(i => i.Id == id);
-                if(getData == null)
+                if (getData == null)
                 {
                     cnt = false;
                 }
@@ -1687,7 +1696,7 @@ namespace CSBEF.Module.UserManagement.Services
                     rtn.Result = userDetailsModel;
                 }
 
-                #endregion
+                #endregion Action Body
 
                 #region Clear Memory
 
@@ -1701,7 +1710,7 @@ namespace CSBEF.Module.UserManagement.Services
                 convertedGroupInRoles = null;
                 userInRoles = null;
 
-                #endregion
+                #endregion Clear Memory
             }
             catch (Exception ex)
             {

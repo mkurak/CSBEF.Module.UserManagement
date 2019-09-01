@@ -1,6 +1,6 @@
-﻿using CSBEF.Module.UserManagement.Poco;
-using CSBEF.Core.Concretes;
+﻿using CSBEF.Core.Concretes;
 using CSBEF.Core.Interfaces;
+using CSBEF.Module.UserManagement.Poco;
 using Microsoft.EntityFrameworkCore;
 
 namespace CSBEF.Module.UserManagement

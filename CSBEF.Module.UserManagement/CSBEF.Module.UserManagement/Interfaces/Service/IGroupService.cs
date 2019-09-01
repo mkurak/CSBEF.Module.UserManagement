@@ -13,8 +13,11 @@ namespace CSBEF.Module.UserManagement.Interfaces.Service
     public interface IGroupService : IServiceBase<Group, GroupDTO>
     {
         Task<IReturnModel<IList<UserGroupDetailsModel>>> ListWithDetails(ServiceParamsWithIdentifier<ActionFilterModel> args);
+
         Task<IReturnModel<GroupDTO>> Save(ServiceParamsWithIdentifier<SaveGroupModel> args);
+
         Task<IReturnModel<bool>> ChangeStatus(ServiceParamsWithIdentifier<ChangeStatusModel> args);
+
         Task<IReturnModel<bool>> SaveGroupInRoles(ServiceParamsWithIdentifier<SaveGroupInRoleModel> args);
     }
 }

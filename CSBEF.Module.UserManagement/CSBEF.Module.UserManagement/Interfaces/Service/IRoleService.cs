@@ -6,6 +6,5 @@ namespace CSBEF.Module.UserManagement.Interfaces.Service
 {
     public interface IRoleService : IServiceBase<Role, RoleDTO>
     {
-
     }
 }

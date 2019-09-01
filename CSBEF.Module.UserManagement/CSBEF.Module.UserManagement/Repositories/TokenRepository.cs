@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using CSBEF.Module.UserManagement.Interfaces.Repository;
-using CSBEF.Module.UserManagement.Poco;
 using CSBEF.Core.Abstracts;
 using CSBEF.Core.Concretes;
+using CSBEF.Module.UserManagement.Interfaces.Repository;
+using CSBEF.Module.UserManagement.Poco;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,7 +20,7 @@ namespace CSBEF.Module.UserManagement.Repositories
             var findAllTokens = await FindAllAsync(i => i.UserId == userId);
             if (findAllTokens.Any())
             {
-                foreach(var token in findAllTokens)
+                foreach (var token in findAllTokens)
                 {
                     token.Status = false;
                     token.UpdatingDate = DateTime.Now;

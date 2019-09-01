@@ -1,9 +1,9 @@
-﻿using CSBEF.Module.UserManagement.Interfaces.Service;
-using CSBEF.Module.UserManagement.Models.Request;
-using CSBEF.Core.Concretes;
+﻿using CSBEF.Core.Concretes;
 using CSBEF.Core.Interfaces;
 using CSBEF.Core.Models;
 using CSBEF.Core.Models.HubModels;
+using CSBEF.Module.UserManagement.Interfaces.Service;
+using CSBEF.Module.UserManagement.Models.Request;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -79,6 +79,7 @@ namespace CSBEF.Module.UserManagement
                             };
                         }
                         break;
+
                     case "NotifyTest":
                         var hubNotificationService = _serviceProvicer.GetService<IHubNotificationService>();
                         await hubNotificationService.OnNotify(new NotificationModel

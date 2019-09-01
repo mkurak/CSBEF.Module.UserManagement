@@ -1,13 +1,13 @@
-﻿using CSBEF.Module.UserManagement.Interfaces.Service;
-using CSBEF.Module.UserManagement.Models.DTO;
-using CSBEF.Module.UserManagement.Models.Request;
-using CSBEF.Module.UserManagement.Models.Return;
-using CSBEF.Core.Concretes;
+﻿using CSBEF.Core.Concretes;
 using CSBEF.Core.Enums;
 using CSBEF.Core.Helpers;
 using CSBEF.Core.Interfaces;
 using CSBEF.Core.Models;
 using CSBEF.Core.Models.HelperModels;
+using CSBEF.Module.UserManagement.Interfaces.Service;
+using CSBEF.Module.UserManagement.Models.DTO;
+using CSBEF.Module.UserManagement.Models.Request;
+using CSBEF.Module.UserManagement.Models.Return;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -62,7 +62,7 @@ namespace CSBEF.Module.UserManagement.Controllers
                 return BadRequest(rtn.SendError(GlobalErrors.HashCodeInValid));
             }
 
-            #endregion
+            #endregion Hash Control
 
             #region Action Body
 
@@ -107,17 +107,17 @@ namespace CSBEF.Module.UserManagement.Controllers
                 return BadRequest(rtn.SendError(GlobalErrors.HashCodeInValid));
             }
 
-            #endregion
+            #endregion Hash Control
 
             #region PictureType Control
 
-            if(data.PictureType != "User.ProfilePicture")
+            if (data.PictureType != "User.ProfilePicture")
             {
                 rtn = rtn.SendError(GlobalErrors.WrongPictureType);
                 return Ok(rtn);
             }
 
-            #endregion
+            #endregion PictureType Control
 
             #region Action Body
 
@@ -162,7 +162,7 @@ namespace CSBEF.Module.UserManagement.Controllers
                 return BadRequest(rtn.SendError(GlobalErrors.HashCodeInValid));
             }
 
-            #endregion
+            #endregion Hash Control
 
             #region PictureType Control
 
@@ -172,7 +172,7 @@ namespace CSBEF.Module.UserManagement.Controllers
                 return Ok(rtn);
             }
 
-            #endregion
+            #endregion PictureType Control
 
             #region Action Body
 
@@ -217,7 +217,7 @@ namespace CSBEF.Module.UserManagement.Controllers
                 return BadRequest(rtn.SendError(GlobalErrors.HashCodeInValid));
             }
 
-            #endregion
+            #endregion Hash Control
 
             #region Action Body
 
@@ -303,7 +303,7 @@ namespace CSBEF.Module.UserManagement.Controllers
                 return BadRequest(rtn.SendError(GlobalErrors.HashCodeInValid));
             }
 
-            #endregion
+            #endregion Hash Control
 
             #region Action Body
 

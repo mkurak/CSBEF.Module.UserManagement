@@ -1,9 +1,12 @@
-﻿using CSBEF.Module.UserManagement.Interfaces.Service;
-using CSBEF.Module.UserManagement.Models.DTO;
+﻿using CSBEF.Core.Concretes;
 using CSBEF.Core.Enums;
 using CSBEF.Core.Helpers;
 using CSBEF.Core.Interfaces;
 using CSBEF.Core.Models;
+using CSBEF.Module.UserManagement.Interfaces.Service;
+using CSBEF.Module.UserManagement.Models.DTO;
+using CSBEF.Module.UserManagement.Models.Request;
+using CSBEF.Module.UserManagement.Models.Return;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -11,9 +14,6 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using CSBEF.Module.UserManagement.Models.Return;
-using CSBEF.Core.Concretes;
-using CSBEF.Module.UserManagement.Models.Request;
 
 namespace CSBEF.Module.UserManagement.Controllers
 {

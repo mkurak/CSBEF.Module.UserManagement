@@ -1,8 +1,8 @@
-﻿using CSBEF.Module.UserManagement.Interfaces.Repository;
+﻿using CSBEF.Core.Interfaces;
+using CSBEF.Module.UserManagement.Interfaces.Repository;
 using CSBEF.Module.UserManagement.Interfaces.Service;
 using CSBEF.Module.UserManagement.Repositories;
 using CSBEF.Module.UserManagement.Services;
-using CSBEF.Core.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CSBEF.Module.UserManagement

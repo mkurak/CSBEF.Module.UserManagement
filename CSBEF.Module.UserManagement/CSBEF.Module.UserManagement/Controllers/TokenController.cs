@@ -1,10 +1,10 @@
-﻿using CSBEF.Module.UserManagement.Interfaces.Service;
-using CSBEF.Module.UserManagement.Models.Request;
-using CSBEF.Core.Concretes;
+﻿using CSBEF.Core.Concretes;
 using CSBEF.Core.Enums;
 using CSBEF.Core.Helpers;
 using CSBEF.Core.Interfaces;
 using CSBEF.Core.Models;
+using CSBEF.Module.UserManagement.Interfaces.Service;
+using CSBEF.Module.UserManagement.Models.Request;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -64,7 +64,7 @@ namespace CSBEF.Module.UserManagement.Controllers
                 return BadRequest(rtn.SendError(GlobalErrors.HashCodeInValid));
             }
 
-            #endregion
+            #endregion Hash Control
 
             #region Action Body
 

@@ -1,5 +1,5 @@
-﻿using CSBEF.Module.UserManagement.Poco;
-using CSBEF.Core.Interfaces;
+﻿using CSBEF.Core.Interfaces;
+using CSBEF.Module.UserManagement.Poco;
 
 namespace CSBEF.Module.UserManagement.Interfaces.Repository
 {

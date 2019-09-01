@@ -123,12 +123,6 @@ namespace CSBEF.Module.UserManagement
 
             #endregion Base Actions
 
-            #region Service Actions
-
-
-
-            #endregion Service Actions
-
             #endregion TokenService
 
             #region RoleService
@@ -146,12 +140,6 @@ namespace CSBEF.Module.UserManagement
             eventService.AddEvent("RoleService.ListAsync.After", "UserManagement", "RoleService", "ListAsync", EventTypeEnum.after);
 
             #endregion Base Actions
-
-            #region Service Actions
-
-
-
-            #endregion Service Actions
 
             #endregion RoleService
 

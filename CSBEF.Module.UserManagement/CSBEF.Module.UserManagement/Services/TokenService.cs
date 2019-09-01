@@ -1,16 +1,16 @@
 ﻿using AutoMapper;
-using CSBEF.Module.UserManagement.Enums.Errors;
-using CSBEF.Module.UserManagement.Interfaces.Repository;
-using CSBEF.Module.UserManagement.Interfaces.Service;
-using CSBEF.Module.UserManagement.Models.DTO;
-using CSBEF.Module.UserManagement.Models.Request;
-using CSBEF.Module.UserManagement.Poco;
 using CSBEF.Core.Abstracts;
 using CSBEF.Core.Concretes;
 using CSBEF.Core.Enums;
 using CSBEF.Core.Helpers;
 using CSBEF.Core.Interfaces;
 using CSBEF.Core.Models;
+using CSBEF.Module.UserManagement.Enums.Errors;
+using CSBEF.Module.UserManagement.Interfaces.Repository;
+using CSBEF.Module.UserManagement.Interfaces.Service;
+using CSBEF.Module.UserManagement.Models.DTO;
+using CSBEF.Module.UserManagement.Models.Request;
+using CSBEF.Module.UserManagement.Poco;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -224,7 +224,7 @@ namespace CSBEF.Module.UserManagement.Services
                     }
                 }
 
-                if(cnt && string.IsNullOrWhiteSpace(rtn.Result))
+                if (cnt && string.IsNullOrWhiteSpace(rtn.Result))
                 {
                     saveTokenModel = new Token
                     {

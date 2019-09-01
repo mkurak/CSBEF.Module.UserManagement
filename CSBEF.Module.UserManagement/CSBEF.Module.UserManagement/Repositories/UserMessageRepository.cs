@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using CSBEF.Module.UserManagement.Interfaces.Repository;
-using CSBEF.Module.UserManagement.Poco;
 using CSBEF.Core.Abstracts;
 using CSBEF.Core.Concretes;
+using CSBEF.Module.UserManagement.Interfaces.Repository;
+using CSBEF.Module.UserManagement.Poco;
 
 namespace CSBEF.Module.UserManagement.Repositories
 {
