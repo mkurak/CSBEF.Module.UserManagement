@@ -2,7 +2,7 @@
 It is a user management module developed for CSBEF structure.
 
 # Current Version
-Version: 1.0.0 ([latest release](https://github.com/mkurak/CSBEF.Module.UserManagement/releases/tag/1.0.0))
+Version: 1.0.1 ([latest release](https://github.com/mkurak/CSBEF.Module.UserManagement/releases/tag/1.0.1))
 
 # Status
 Completed, there is no planned development.
