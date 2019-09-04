@@ -12,7 +12,7 @@
     <RepositoryUrl>https://github.com/mkurak/CSBEF.Module.UserManagement</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
     <PackageTags>CSBEF User Management Module (official)</PackageTags>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <PackageReleaseNotes>- Code cleanup</PackageReleaseNotes>
   </PropertyGroup>
 
@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CSBEF.Core" Version="1.3.3" />
+    <PackageReference Include="CSBEF.Core" Version="1.3.4" />
   </ItemGroup>
 
 </Project>
