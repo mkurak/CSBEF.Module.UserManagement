@@ -41,7 +41,7 @@ namespace CSBEF.Module.UserManagement.Services
         #region ctor
 
         public TokenService(
-            IHostingEnvironment hostingEnvironment,
+            IWebHostEnvironment hostingEnvironment,
             IConfiguration configuration,
             ILogger<ILog> logger,
             IMapper mapper,

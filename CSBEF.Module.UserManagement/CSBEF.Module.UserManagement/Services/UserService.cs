@@ -42,7 +42,7 @@ namespace CSBEF.Module.UserManagement.Services
         #region ctor
 
         public UserService(
-           IHostingEnvironment hostingEnvironment,
+           IWebHostEnvironment hostingEnvironment,
            IConfiguration configuration,
            ILogger<ILog> logger,
            IMapper mapper,
@@ -283,8 +283,11 @@ namespace CSBEF.Module.UserManagement.Services
                 {
                     if (!string.IsNullOrWhiteSpace(getUser.ProfilePic))
                     {
-                        targetRemoveFile = Path.Combine(uploaderRootPath, getUser.ProfilePic);
-                        File.Delete(targetRemoveFile);
+                        if(getUser.ProfilePic != "default.jpg")
+                        {
+                            targetRemoveFile = Path.Combine(uploaderRootPath, getUser.ProfilePic);
+                            File.Delete(targetRemoveFile);
+                        }
                     }
 
                     getUser.ProfilePic = savedFileName.Result;
@@ -436,8 +439,11 @@ namespace CSBEF.Module.UserManagement.Services
                 {
                     if (!string.IsNullOrWhiteSpace(getUser.ProfileBgPic))
                     {
-                        targetRemoveFile = Path.Combine(uploaderRootPath, getUser.ProfilePic);
-                        File.Delete(targetRemoveFile);
+                        if(getUser.ProfileBgPic != "default.jpg")
+                        {
+                            targetRemoveFile = Path.Combine(uploaderRootPath, getUser.ProfilePic);
+                            File.Delete(targetRemoveFile);
+                        }
                     }
 
                     getUser.ProfileBgPic = savedFileName.Result;

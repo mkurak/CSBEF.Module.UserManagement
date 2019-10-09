@@ -32,7 +32,7 @@ namespace CSBEF.Module.UserManagement.Services
         #region ctor
 
         public UserMessageService(
-           IHostingEnvironment hostingEnvironment,
+           IWebHostEnvironment hostingEnvironment,
            IConfiguration configuration,
            ILogger<ILog> logger,
            IMapper mapper,
