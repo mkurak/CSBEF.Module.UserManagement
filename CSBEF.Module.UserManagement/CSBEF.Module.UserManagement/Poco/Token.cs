@@ -3,7 +3,7 @@ using System;
 
 namespace CSBEF.Module.UserManagement.Poco
 {
-    public class Token : EntityModelBase
+    public partial class Token : EntityModelBase
     {
         public int UserId { get; set; }
         public string NotificationToken { get; set; }
@@ -11,7 +11,5 @@ namespace CSBEF.Module.UserManagement.Poco
         public DateTime ExpiredDate { get; set; }
         public string Device { get; set; }
         public string DeviceKey { get; set; }
-
-        public virtual User User { get; set; }
     }
 }

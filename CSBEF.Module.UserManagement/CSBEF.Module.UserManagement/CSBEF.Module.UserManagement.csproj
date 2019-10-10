@@ -12,9 +12,8 @@
     <RepositoryUrl>https://github.com/mkurak/CSBEF.Module.UserManagement</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
     <PackageTags>CSBEF User Management Module (official)</PackageTags>
-    <Version>1.1.0</Version>
-    <PackageReleaseNotes>- Core 3 updated
-- CSBEF.Core 2.0.1 updated</PackageReleaseNotes>
+    <Version>1.1.1</Version>
+    <PackageReleaseNotes>- Fixed POCO models</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

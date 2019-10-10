@@ -35,9 +35,7 @@ namespace CSBEF.Module.UserManagement
                     .IsRequired()
                     .HasMaxLength(256);
 
-                entity.Property(e => e.Status)
-                    .IsRequired()
-                    .HasDefaultValueSql("((1))");
+                entity.Property(e => e.Status).HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.UpdatingDate)
                     .HasColumnType("datetime")
@@ -52,25 +50,11 @@ namespace CSBEF.Module.UserManagement
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.Status)
-                    .IsRequired()
-                    .HasDefaultValueSql("((1))");
+                entity.Property(e => e.Status).HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.UpdatingDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
-
-                entity.HasOne(d => d.Group)
-                    .WithMany(p => p.GroupInRole)
-                    .HasForeignKey(d => d.GroupId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_UserManagement_GroupInRole_UserManagement_Group");
-
-                entity.HasOne(d => d.Role)
-                    .WithMany(p => p.GroupInRole)
-                    .HasForeignKey(d => d.RoleId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_UserManagement_GroupInRole_UserManagement_Role");
             });
 
             modelBuilder.Entity<Role>(entity =>
@@ -85,9 +69,7 @@ namespace CSBEF.Module.UserManagement
 
                 entity.Property(e => e.RoleTitle).HasMaxLength(256);
 
-                entity.Property(e => e.Status)
-                    .IsRequired()
-                    .HasDefaultValueSql("((1))");
+                entity.Property(e => e.Status).HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.UpdatingDate)
                     .HasColumnType("datetime")
@@ -112,21 +94,15 @@ namespace CSBEF.Module.UserManagement
 
                 entity.Property(e => e.ExpiredDate).HasColumnType("datetime");
 
-                entity.Property(e => e.Status)
-                    .IsRequired()
-                    .HasDefaultValueSql("((1))");
+                entity.Property(e => e.NotificationToken).HasMaxLength(256);
+
+                entity.Property(e => e.Status).HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.TokenCode).IsRequired();
 
                 entity.Property(e => e.UpdatingDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
-
-                entity.HasOne(d => d.User)
-                    .WithMany(p => p.Token)
-                    .HasForeignKey(d => d.UserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_UserManagement_Token_UserManagement_User");
             });
 
             modelBuilder.Entity<User>(entity =>
@@ -153,15 +129,15 @@ namespace CSBEF.Module.UserManagement
 
                 entity.Property(e => e.ProfileStatusMessage).HasMaxLength(512);
 
-                entity.Property(e => e.Status)
-                    .IsRequired()
-                    .HasDefaultValueSql("((1))");
+                entity.Property(e => e.Status).HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.Surname).HasMaxLength(256);
 
                 entity.Property(e => e.UpdatingDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.UserName).HasMaxLength(32);
             });
 
             modelBuilder.Entity<UserInGroup>(entity =>
@@ -172,25 +148,11 @@ namespace CSBEF.Module.UserManagement
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.Status)
-                    .IsRequired()
-                    .HasDefaultValueSql("((1))");
+                entity.Property(e => e.Status).HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.UpdatingDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
-
-                entity.HasOne(d => d.Group)
-                    .WithMany(p => p.UserInGroup)
-                    .HasForeignKey(d => d.GroupId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_UserManagement_UserInGroup_UserManagement_Group");
-
-                entity.HasOne(d => d.User)
-                    .WithMany(p => p.UserInGroup)
-                    .HasForeignKey(d => d.UserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_UserManagement_UserInGroup_UserManagement_User");
             });
 
             modelBuilder.Entity<UserInRole>(entity =>
@@ -201,25 +163,11 @@ namespace CSBEF.Module.UserManagement
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.Status)
-                    .IsRequired()
-                    .HasDefaultValueSql("((1))");
+                entity.Property(e => e.Status).HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.UpdatingDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
-
-                entity.HasOne(d => d.Role)
-                    .WithMany(p => p.UserInRole)
-                    .HasForeignKey(d => d.RoleId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_UserManagement_UserInRole_UserManagement_Role");
-
-                entity.HasOne(d => d.User)
-                    .WithMany(p => p.UserInRole)
-                    .HasForeignKey(d => d.UserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_UserManagement_UserInRole_UserManagement_User");
             });
 
             modelBuilder.Entity<UserMessage>(entity =>
@@ -238,21 +186,13 @@ namespace CSBEF.Module.UserManagement
                     .IsRequired()
                     .HasMaxLength(4000);
 
+                entity.Property(e => e.Status).HasDefaultValueSql("((1))");
+
                 entity.Property(e => e.UpdatingDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.ViewDate).HasColumnType("datetime");
-
-                entity.HasOne(d => d.FromUser)
-                    .WithMany(p => p.UserMessageFromUser)
-                    .HasForeignKey(d => d.FromUserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
-
-                entity.HasOne(d => d.ToUser)
-                    .WithMany(p => p.UserMessageToUser)
-                    .HasForeignKey(d => d.ToUserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
             });
         }
 

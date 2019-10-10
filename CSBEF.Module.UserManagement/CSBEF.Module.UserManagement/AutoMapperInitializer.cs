@@ -11,30 +11,14 @@ namespace CSBEF.Module.UserManagement
         {
             #region Poco => Poco
 
-            CreateMap<Group, Group>()
-                .ForMember(x => x.GroupInRole, opt => opt.Ignore())
-                .ForMember(x => x.UserInGroup, opt => opt.Ignore());
-            CreateMap<GroupInRole, GroupInRole>()
-                .ForMember(x => x.Group, opt => opt.Ignore())
-                .ForMember(x => x.Role, opt => opt.Ignore());
-            CreateMap<Role, Role>()
-                .ForMember(x => x.GroupInRole, opt => opt.Ignore())
-                .ForMember(x => x.UserInRole, opt => opt.Ignore());
-            CreateMap<Token, Token>()
-                .ForMember(x => x.User, opt => opt.Ignore());
-            CreateMap<User, User>()
-                .ForMember(x => x.Token, opt => opt.Ignore())
-                .ForMember(x => x.UserInRole, opt => opt.Ignore())
-                .ForMember(x => x.UserInGroup, opt => opt.Ignore());
-            CreateMap<UserInGroup, UserInGroup>()
-                .ForMember(x => x.Group, opt => opt.Ignore())
-                .ForMember(x => x.User, opt => opt.Ignore());
-            CreateMap<UserInRole, UserInRole>()
-                .ForMember(x => x.Role, opt => opt.Ignore())
-                .ForMember(x => x.User, opt => opt.Ignore());
-            CreateMap<UserMessage, UserMessage>()
-                .ForMember(x => x.FromUser, opt => opt.Ignore())
-                .ForMember(x => x.ToUser, opt => opt.Ignore());
+            CreateMap<Group, Group>();
+            CreateMap<GroupInRole, GroupInRole>();
+            CreateMap<Role, Role>();
+            CreateMap<Token, Token>();
+            CreateMap<User, User>();
+            CreateMap<UserInGroup, UserInGroup>();
+            CreateMap<UserInRole, UserInRole>();
+            CreateMap<UserMessage, UserMessage>();
 
             #endregion Poco => Poco
 
