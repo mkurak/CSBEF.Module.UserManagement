@@ -1,23 +1,21 @@
-﻿using AutoMapper;
-using CSBEF.Core.Abstracts;
+﻿using CSBEF.Core.Abstracts;
 using CSBEF.Core.Concretes;
 using CSBEF.Module.UserManagement.Interfaces.Repository;
 using CSBEF.Module.UserManagement.Poco;
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace CSBEF.Module.UserManagement.Repositories
 {
     public class TokenRepository : RepositoryBase<Token>, ITokenRepository
     {
-        public TokenRepository(ModularDbContext context, IMapper mapper) : base(context, mapper)
+        public TokenRepository(ModularDbContext context) : base(context)
         {
         }
 
-        public async Task<bool> KillUserTokens(int userId, int processUserId)
+        public bool KillUserTokens(int userId, int processUserId)
         {
-            var findAllTokens = await FindAllAsync(i => i.UserId == userId);
+            var findAllTokens = FindAll(i => i.UserId == userId);
             if (findAllTokens.Any())
             {
                 foreach (var token in findAllTokens)
@@ -28,7 +26,7 @@ namespace CSBEF.Module.UserManagement.Repositories
                     Update(token);
                 }
 
-                await SaveAsync();
+                Save();
             }
 
             return true;

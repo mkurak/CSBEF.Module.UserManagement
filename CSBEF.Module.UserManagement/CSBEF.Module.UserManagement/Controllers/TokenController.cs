@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Threading.Tasks;
 
 namespace CSBEF.Module.UserManagement.Controllers
 {
@@ -19,7 +18,7 @@ namespace CSBEF.Module.UserManagement.Controllers
     {
         #region Dependencies
 
-        private IConfiguration _configuration;
+        private readonly IConfiguration _configuration;
         private readonly ILogger<ILog> _logger;
         private readonly ITokenService _service;
 
@@ -48,8 +47,11 @@ namespace CSBEF.Module.UserManagement.Controllers
 
         [Route("api/UserManagement/Token/CreateToken")]
         [HttpPost]
-        public async Task<ActionResult<IReturnModel<string>>> CreateToken([FromBody]CreateTokenModel data)
+        public ActionResult<IReturnModel<string>> CreateToken([FromBody]CreateTokenModel data)
         {
+            if (data == null)
+                throw new ArgumentNullException(nameof(data));
+
             #region Declares
 
             IReturnModel<string> rtn = new ReturnModel<string>(_logger);
@@ -70,7 +72,7 @@ namespace CSBEF.Module.UserManagement.Controllers
 
             try
             {
-                IReturnModel<string> getCreateToken = await _service.CreateToken(new ServiceParamsWithIdentifier<CreateTokenModel>(data, 0, 0));
+                IReturnModel<string> getCreateToken = _service.CreateToken(new ServiceParamsWithIdentifier<CreateTokenModel>(data, 0, 0));
                 if (getCreateToken.Error.Status)
                     rtn.Error = getCreateToken.Error;
                 else

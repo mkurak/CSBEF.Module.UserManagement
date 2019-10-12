@@ -7,7 +7,7 @@ namespace CSBEF.Module.UserManagement.Models.Return
     public class UserForCurrentUser : UserDTO
     {
         public DateTime LastMessage { get; set; } = DateTime.MinValue;
-        public IList<MessageModelForCurrentUser> Messages { get; set; }
+        public IList<MessageModelForCurrentUser> Messages { get; } = new List<MessageModelForCurrentUser>();
 
         public UserForCurrentUser()
         {

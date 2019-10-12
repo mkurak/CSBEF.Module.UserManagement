@@ -12,7 +12,6 @@ using CSBEF.Module.UserManagement.Models.DTO;
 using CSBEF.Module.UserManagement.Models.Request;
 using CSBEF.Module.UserManagement.Poco;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -22,7 +21,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace CSBEF.Module.UserManagement.Services
 {
@@ -30,11 +28,11 @@ namespace CSBEF.Module.UserManagement.Services
     {
         #region Other Repositories
 
-        private IUserRepository _userRepository;
-        private IUserInGroupRepository _userInGroupRepository;
-        private IGroupInRoleRepository _groupInRoleRepository;
-        private IUserInRoleRepository _userInRoleRepository;
-        private IRoleRepository _roleRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IUserInGroupRepository _userInGroupRepository;
+        private readonly IGroupInRoleRepository _groupInRoleRepository;
+        private readonly IUserInRoleRepository _userInRoleRepository;
+        private readonly IRoleRepository _roleRepository;
 
         #endregion Other Repositories
 
@@ -76,10 +74,15 @@ namespace CSBEF.Module.UserManagement.Services
 
         #region Public Actions
 
-        public async Task<IReturnModel<string>> CreateToken(ServiceParamsWithIdentifier<CreateTokenModel> args)
+        public IReturnModel<string> CreateToken(ServiceParamsWithIdentifier<CreateTokenModel> args)
         {
-            IReturnModel<string> rtn = new ReturnModel<string>(_logger);
-            rtn.Result = "";
+            if (args == null)
+                throw new ArgumentNullException(nameof(args));
+
+            IReturnModel<string> rtn = new ReturnModel<string>(_logger)
+            {
+                Result = ""
+            };
 
             try
             {
@@ -104,7 +107,7 @@ namespace CSBEF.Module.UserManagement.Services
 
                 #region Before Event Handler
 
-                beforeEventHandler = await _eventService.GetEvent(ModuleName, $"{ServiceName}.CreateToken.Before").EventHandler<bool, ServiceParamsWithIdentifier<CreateTokenModel>>(args);
+                beforeEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.CreateToken.Before").EventHandler<bool, ServiceParamsWithIdentifier<CreateTokenModel>>(args);
                 if (beforeEventHandler != null)
                 {
                     if (beforeEventHandler.Error.Status)
@@ -178,7 +181,7 @@ namespace CSBEF.Module.UserManagement.Services
                 {
                     if (!string.IsNullOrWhiteSpace(args.Param.UserName))
                     {
-                        getUser = await _userRepository.GetAll().FirstOrDefaultAsync(i => i.UserName == args.Param.UserName);
+                        getUser = _userRepository.GetAll().FirstOrDefault(i => i.UserName == args.Param.UserName);
                         if (getUser == null)
                         {
                             rtn = rtn.SendError(TokenErrorsEnum.CreateToken_UserNotFound);
@@ -187,7 +190,7 @@ namespace CSBEF.Module.UserManagement.Services
                     }
                     else
                     {
-                        getUser = await _userRepository.GetAll().FirstOrDefaultAsync(i => i.Email == args.Param.Email);
+                        getUser = _userRepository.GetAll().FirstOrDefault(i => i.Email == args.Param.Email);
                         if (getUser == null)
                         {
                             rtn = rtn.SendError(TokenErrorsEnum.CreateToken_UserNotFound);
@@ -198,7 +201,10 @@ namespace CSBEF.Module.UserManagement.Services
 
                 if (cnt)
                 {
-                    if (getUser.Password.ToUpper() != args.Param.Password.ToUpper())
+                    getUser.Password = getUser.Password.ToUpper();
+                    args.Param.Password = args.Param.Password.ToUpper();
+
+                    if (getUser.Password != args.Param.Password)
                     {
                         cnt = false;
                         rtn = rtn.SendError(TokenErrorsEnum.CreateToken_WrongPass);
@@ -207,7 +213,7 @@ namespace CSBEF.Module.UserManagement.Services
 
                 if (cnt)
                 {
-                    getToken = await Repository.GetAll().FirstOrDefaultAsync(i => i.UserId == getUser.Id && i.DeviceKey == args.Param.DeviceKey && i.Status == true);
+                    getToken = Repository.GetAll().FirstOrDefault(i => i.UserId == getUser.Id && i.DeviceKey == args.Param.DeviceKey && i.Status == true);
                     if (getToken != null)
                     {
                         rtn.Result = getToken.TokenCode;
@@ -216,7 +222,7 @@ namespace CSBEF.Module.UserManagement.Services
 
                 if (cnt && string.IsNullOrWhiteSpace(rtn.Result))
                 {
-                    getUserRoles = await GetUserRoleList(getUser.Id);
+                    getUserRoles = GetUserRoleList(getUser.Id);
                     if (getUserRoles.Error.Status)
                     {
                         rtn.Error = getUserRoles.Error;
@@ -240,7 +246,7 @@ namespace CSBEF.Module.UserManagement.Services
                         DeviceKey = args.Param.DeviceKey
                     };
                     saveTokenModel = Repository.Add(saveTokenModel);
-                    await Repository.SaveAsync();
+                    Repository.SaveAsync();
                 }
 
                 if (cnt && string.IsNullOrWhiteSpace(rtn.Result))
@@ -252,7 +258,7 @@ namespace CSBEF.Module.UserManagement.Services
                         Audience = "CSBEF",
                         Issuer = "JWT.CSBEF",
                         Subject = new ClaimsIdentity(new Claim[] {
-                        new Claim(ClaimTypes.Name, getUser.Id.ToString()),
+                        new Claim(ClaimTypes.Name, getUser.Id.ToStringNotNull("")),
                         new Claim(ClaimTypes.Email, getUser.Email),
                         new Claim(ClaimTypes.GivenName, args.Param.Device),
                         new Claim(ClaimTypes.SerialNumber, args.Param.DeviceKey),
@@ -261,7 +267,7 @@ namespace CSBEF.Module.UserManagement.Services
                         new Claim("ProfilePic", getUser.ProfilePic),
                         new Claim("ProfileBgPic", getUser.ProfileBgPic),
                         new Claim("ProfileStatusMessage", getUser.ProfileStatusMessage),
-                        new Claim("TokenId", saveTokenModel.Id.ToString())
+                        new Claim("TokenId", saveTokenModel.Id.ToStringNotNull(""))
                     }),
                         Expires = DateTime.UtcNow.AddDays(_configuration["AppSettings:JWTSettings:ExpireDays"].ToInt(365)),
                         SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -284,7 +290,7 @@ namespace CSBEF.Module.UserManagement.Services
                     saveTokenModel.TokenCode = tokenString;
 
                     Repository.Update(saveTokenModel);
-                    await Repository.SaveAsync();
+                    Repository.Save();
 
                     rtn.Result = tokenString;
                 }
@@ -303,7 +309,7 @@ namespace CSBEF.Module.UserManagement.Services
                         ServiceName = ServiceName,
                         ActionName = "CreateToken"
                     };
-                    afterEventHandler = await _eventService.GetEvent(ModuleName, $"{ServiceName}.CreateToken.After")
+                    afterEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.CreateToken.After")
                         .EventHandler<string, IAfterEventParameterModel<IReturnModel<string>, ServiceParamsWithIdentifier<CreateTokenModel>>>(afterEventParameterModel);
                     if (afterEventHandler != null)
                     {
@@ -347,8 +353,11 @@ namespace CSBEF.Module.UserManagement.Services
             return rtn;
         }
 
-        public async Task<IReturnModel<bool>> CheckToken(ServiceParamsWithIdentifier<string> args)
+        public IReturnModel<bool> CheckToken(ServiceParamsWithIdentifier<string> args)
         {
+            if (args == null)
+                throw new ArgumentNullException(nameof(args));
+
             IReturnModel<bool> rtn = new ReturnModel<bool>(_logger);
 
             try
@@ -372,7 +381,7 @@ namespace CSBEF.Module.UserManagement.Services
 
                 #region Before Event Handler
 
-                beforeEventHandler = await _eventService.GetEvent(ModuleName, $"{ServiceName}.CheckToken.Before").EventHandler<bool, ServiceParamsWithIdentifier<string>>(args);
+                beforeEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.CheckToken.Before").EventHandler<bool, ServiceParamsWithIdentifier<string>>(args);
                 if (beforeEventHandler != null)
                 {
                     if (beforeEventHandler.Error.Status)
@@ -407,7 +416,7 @@ namespace CSBEF.Module.UserManagement.Services
 
                 if (cnt)
                 {
-                    getTokens = await Repository.GetAll().Where(i => i.UserId == userId.Value.ToInt(0) && i.DeviceKey == deviceKey.Value).ToListAsync();
+                    getTokens = Repository.GetAll().Where(i => i.UserId == userId.Value.ToInt(0) && i.DeviceKey == deviceKey.Value).ToList();
                     cnt = getTokens.Any();
                 }
 
@@ -438,7 +447,7 @@ namespace CSBEF.Module.UserManagement.Services
                         ServiceName = ServiceName,
                         ActionName = "CheckToken"
                     };
-                    afterEventHandler = await _eventService.GetEvent(ModuleName, $"{ServiceName}.CreateToken.After")
+                    afterEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.CreateToken.After")
                         .EventHandler<bool, IAfterEventParameterModel<IReturnModel<bool>, ServiceParamsWithIdentifier<string>>>(afterEventParameterModel);
                     if (afterEventHandler != null)
                     {
@@ -485,7 +494,7 @@ namespace CSBEF.Module.UserManagement.Services
 
         #region Private Helpers
 
-        private async Task<IReturnModel<IList<RoleDTO>>> GetUserRoleList(int userId)
+        private IReturnModel<IList<RoleDTO>> GetUserRoleList(int userId)
         {
             IReturnModel<IList<RoleDTO>> rtn = new ReturnModel<IList<RoleDTO>>(_logger);
 
@@ -508,7 +517,7 @@ namespace CSBEF.Module.UserManagement.Services
 
                 #region Before Event Handler
 
-                beforeEventHandler = await _eventService.GetEvent(ModuleName, $"{ServiceName}.GetUserRoleList.Before").EventHandler<bool, int>(userId);
+                beforeEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.GetUserRoleList.Before").EventHandler<bool, int>(userId);
                 if (beforeEventHandler != null)
                 {
                     if (beforeEventHandler.Error.Status)
@@ -525,12 +534,12 @@ namespace CSBEF.Module.UserManagement.Services
                 if (cnt)
                 {
                     rtn.Result = new List<RoleDTO>();
-                    getGroups = await _userInGroupRepository.GetAll().Where(i => i.UserId == userId).ToListAsync();
+                    getGroups = _userInGroupRepository.GetAll().Where(i => i.UserId == userId).ToList();
                     if (getGroups.Any())
                     {
                         foreach (var item in getGroups)
                         {
-                            getGroupInRoles = await _groupInRoleRepository.GetAll().Where(i => i.GroupId == item.GroupId).ToListAsync();
+                            getGroupInRoles = _groupInRoleRepository.GetAll().Where(i => i.GroupId == item.GroupId).ToList();
                             if (getGroupInRoles.Any())
                             {
                                 roles.AddRange(getGroupInRoles.Select(i => i.RoleId));
@@ -538,7 +547,7 @@ namespace CSBEF.Module.UserManagement.Services
                         }
                     }
 
-                    getUserInRoles = await _userInRoleRepository.GetAll().Where(i => i.UserId == userId).ToListAsync();
+                    getUserInRoles = _userInRoleRepository.GetAll().Where(i => i.UserId == userId).ToList();
                     if (getUserInRoles.Any())
                     {
                         roles.AddRange(getUserInRoles.Select(i => i.RoleId));
@@ -552,7 +561,7 @@ namespace CSBEF.Module.UserManagement.Services
                             if (!cnt)
                                 continue;
 
-                            getRole = await _roleRepository.FindAsync(i => i.Id == role);
+                            getRole = _roleRepository.Find(i => i.Id == role);
                             rtn.Result.Add(_mapper.Map<RoleDTO>(getRole));
                         }
                     }
@@ -569,7 +578,7 @@ namespace CSBEF.Module.UserManagement.Services
                         DataToBeSent = rtn.Result,
                         ActionParameter = userId
                     };
-                    afterEventHandler = await _eventService.GetEvent(ModuleName, $"{ServiceName}.GetUserRoleList.After")
+                    afterEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.GetUserRoleList.After")
                         .EventHandler<IList<RoleDTO>, IAfterEventParameterModel<IList<RoleDTO>, int>>(afterEventParameterModel);
                     if (afterEventHandler != null)
                     {

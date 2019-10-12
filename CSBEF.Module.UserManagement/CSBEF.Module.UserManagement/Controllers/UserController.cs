@@ -46,8 +46,11 @@ namespace CSBEF.Module.UserManagement.Controllers
         [Authorize]
         [Route("api/UserManagement/User/ChangePassword")]
         [HttpPost]
-        public async Task<ActionResult<IReturnModel<bool>>> ChangePassword([FromBody]ChangePasswordModel data)
+        public ActionResult<IReturnModel<bool>> ChangePassword([FromBody]ChangePasswordModel data)
         {
+            if (data == null)
+                throw new ArgumentNullException(nameof(data));
+
             #region Declares
 
             IReturnModel<bool> rtn = new ReturnModel<bool>(_logger);
@@ -72,7 +75,7 @@ namespace CSBEF.Module.UserManagement.Controllers
                 var tokenId = Tools.GetTokenIdClaim(HttpContext);
 
                 var serviceFilterModel = new ServiceParamsWithIdentifier<ChangePasswordModel>(data, userId, tokenId);
-                IReturnModel<bool> serviceAction = await _service.ChangePassword(serviceFilterModel);
+                IReturnModel<bool> serviceAction = _service.ChangePassword(serviceFilterModel);
                 if (serviceAction.Error.Status)
                     rtn.Error = serviceAction.Error;
                 else
@@ -91,8 +94,11 @@ namespace CSBEF.Module.UserManagement.Controllers
         [Authorize]
         [Route("api/UserManagement/User/ChangeProfilePicture")]
         [HttpPost]
-        public async Task<ActionResult<IReturnModel<string>>> ChangeProfilePicture([FromForm]ChangePictureModel data)
+        public ActionResult<IReturnModel<string>> ChangeProfilePicture([FromForm]ChangePictureModel data)
         {
+            if (data == null)
+                throw new ArgumentNullException(nameof(data));
+
             #region Declares
 
             IReturnModel<string> rtn = new ReturnModel<string>(_logger);
@@ -127,7 +133,7 @@ namespace CSBEF.Module.UserManagement.Controllers
                 var tokenId = Tools.GetTokenIdClaim(HttpContext);
 
                 var serviceFilterModel = new ServiceParamsWithIdentifier<ChangePictureModel>(data, userId, tokenId);
-                IReturnModel<string> serviceAction = await _service.ChangePicture(serviceFilterModel);
+                IReturnModel<string> serviceAction = _service.ChangePicture(serviceFilterModel);
                 if (serviceAction.Error.Status)
                     rtn.Error = serviceAction.Error;
                 else
@@ -146,8 +152,11 @@ namespace CSBEF.Module.UserManagement.Controllers
         [Authorize]
         [Route("api/UserManagement/User/ChangeProfileBgPicture")]
         [HttpPost]
-        public async Task<ActionResult<IReturnModel<string>>> ChangeProfileBgPicture([FromForm]ChangePictureModel data)
+        public ActionResult<IReturnModel<string>> ChangeProfileBgPicture([FromForm]ChangePictureModel data)
         {
+            if (data == null)
+                throw new ArgumentNullException(nameof(data));
+
             #region Declares
 
             IReturnModel<string> rtn = new ReturnModel<string>(_logger);
@@ -182,7 +191,7 @@ namespace CSBEF.Module.UserManagement.Controllers
                 var tokenId = Tools.GetTokenIdClaim(HttpContext);
 
                 var serviceFilterModel = new ServiceParamsWithIdentifier<ChangePictureModel>(data, userId, tokenId);
-                IReturnModel<string> serviceAction = await _service.ChangeBgPicture(serviceFilterModel);
+                IReturnModel<string> serviceAction = _service.ChangeBgPicture(serviceFilterModel);
                 if (serviceAction.Error.Status)
                     rtn.Error = serviceAction.Error;
                 else
@@ -201,8 +210,11 @@ namespace CSBEF.Module.UserManagement.Controllers
         [Authorize]
         [Route("api/UserManagement/User/Get")]
         [HttpGet]
-        public async Task<ActionResult<IReturnModel<UserDTO>>> Get([FromQuery]ActionFilterModel filter)
+        public ActionResult<IReturnModel<UserDTO>> Get([FromQuery]ActionFilterModel filter)
         {
+            if (filter == null)
+                throw new ArgumentNullException(nameof(filter));
+
             #region Declares
 
             IReturnModel<UserDTO> rtn = new ReturnModel<UserDTO>(_logger);
@@ -224,7 +236,7 @@ namespace CSBEF.Module.UserManagement.Controllers
             try
             {
                 var userId = Tools.GetTokenNameClaim(HttpContext);
-                IReturnModel<UserDTO> serviceAction = await _service.FirstOrDefaultAsync(filter);
+                IReturnModel<UserDTO> serviceAction = _service.FirstOrDefault(filter);
                 if (serviceAction.Error.Status)
                     rtn.Error = serviceAction.Error;
                 else
@@ -246,7 +258,7 @@ namespace CSBEF.Module.UserManagement.Controllers
         [Authorize]
         [Route("api/UserManagement/User/UserListForCurrentUser")]
         [HttpGet]
-        public async Task<ActionResult<IReturnModel<IList<UserForCurrentUser>>>> UserListForCurrentUser()
+        public ActionResult<IReturnModel<IList<UserForCurrentUser>>> UserListForCurrentUser()
         {
             #region Declares
 
@@ -260,7 +272,7 @@ namespace CSBEF.Module.UserManagement.Controllers
             {
                 var userId = Tools.GetTokenNameClaim(HttpContext);
                 var tokenId = Tools.GetTokenIdClaim(HttpContext);
-                IReturnModel<IList<UserForCurrentUser>> serviceAction = await _service.UserListForCurrentUser(new ServiceParamsWithIdentifier<int>(userId, userId, tokenId));
+                IReturnModel<IList<UserForCurrentUser>> serviceAction = _service.UserListForCurrentUser(new ServiceParamsWithIdentifier<int>(userId, userId, tokenId));
                 if (serviceAction.Error.Status)
                     rtn.Error = serviceAction.Error;
                 else
@@ -287,8 +299,11 @@ namespace CSBEF.Module.UserManagement.Controllers
         [Authorize]
         [Route("api/UserManagement/User/ChangeProfileInformations")]
         [HttpPost]
-        public async Task<ActionResult<IReturnModel<bool>>> ChangeProfileInformations([FromBody]ChangeProfileInformationsModel filter)
+        public ActionResult<IReturnModel<bool>> ChangeProfileInformations([FromBody]ChangeProfileInformationsModel filter)
         {
+            if (filter == null)
+                throw new ArgumentNullException(nameof(filter));
+
             #region Declares
 
             IReturnModel<bool> rtn = new ReturnModel<bool>(_logger);
@@ -312,7 +327,7 @@ namespace CSBEF.Module.UserManagement.Controllers
                 var userId = Tools.GetTokenNameClaim(HttpContext);
                 var tokenId = Tools.GetTokenIdClaim(HttpContext);
                 var serviceFilterModel = new ServiceParamsWithIdentifier<ChangeProfileInformationsModel>(filter, userId, tokenId);
-                IReturnModel<bool> serviceAction = await _service.ChangeProfileInformations(serviceFilterModel);
+                IReturnModel<bool> serviceAction = _service.ChangeProfileInformations(serviceFilterModel);
                 if (serviceAction.Error.Status)
                     rtn.Error = serviceAction.Error;
                 else
@@ -330,8 +345,11 @@ namespace CSBEF.Module.UserManagement.Controllers
 
         [Route("api/UserManagement/User/ListWithDetails")]
         [HttpGet]
-        public async Task<ActionResult<IReturnModel<IList<UserDetailsModel>>>> ListWithDetails([FromQuery]ActionFilterModel filter)
+        public ActionResult<IReturnModel<IList<UserDetailsModel>>> ListWithDetails([FromQuery]ActionFilterModel filter)
         {
+            if (filter == null)
+                throw new ArgumentNullException(nameof(filter));
+
             #region Declares
 
             IReturnModel<IList<UserDetailsModel>> rtn = new ReturnModel<IList<UserDetailsModel>>(_logger);
@@ -355,7 +373,7 @@ namespace CSBEF.Module.UserManagement.Controllers
                 var userId = Tools.GetTokenNameClaim(HttpContext);
                 var tokenId = Tools.GetTokenIdClaim(HttpContext);
                 var serviceFilterModel = new ServiceParamsWithIdentifier<ActionFilterModel>(filter, userId, tokenId);
-                IReturnModel<IList<UserDetailsModel>> serviceAction = await _service.ListWithDetails(serviceFilterModel);
+                IReturnModel<IList<UserDetailsModel>> serviceAction = _service.ListWithDetails(serviceFilterModel);
                 if (serviceAction.Error.Status)
                     rtn.Error = serviceAction.Error;
                 else
@@ -374,8 +392,11 @@ namespace CSBEF.Module.UserManagement.Controllers
         [Authorize(Roles = "Root, Root.UserManagement, Root.UserManagement.User, Root.UserManagement.User.Add, Root.UserManagement.User.Update")]
         [Route("api/UserManagement/User/Save")]
         [HttpPost]
-        public async Task<ActionResult<IReturnModel<UserDTO>>> Save([FromBody]SaveUserModel filter)
+        public ActionResult<IReturnModel<UserDTO>> Save([FromBody]SaveUserModel filter)
         {
+            if (filter == null)
+                throw new ArgumentNullException(nameof(filter));
+
             #region Declares
 
             IReturnModel<UserDTO> rtn = new ReturnModel<UserDTO>(_logger);
@@ -399,7 +420,7 @@ namespace CSBEF.Module.UserManagement.Controllers
                 var userId = Tools.GetTokenNameClaim(HttpContext);
                 var tokenId = Tools.GetTokenIdClaim(HttpContext);
                 var serviceFilterModel = new ServiceParamsWithIdentifier<SaveUserModel>(filter, userId, tokenId);
-                IReturnModel<UserDTO> serviceAction = await _service.Save(serviceFilterModel);
+                IReturnModel<UserDTO> serviceAction = _service.Save(serviceFilterModel);
                 if (serviceAction.Error.Status)
                     rtn.Error = serviceAction.Error;
                 else
@@ -418,8 +439,11 @@ namespace CSBEF.Module.UserManagement.Controllers
         [Authorize(Roles = "Root, Root.UserManagement, Root.UserManagement.User, Root.UserManagement.User.ChangeStatus")]
         [Route("api/UserManagement/User/ChangeStatus")]
         [HttpPost]
-        public async Task<ActionResult<IReturnModel<bool>>> ChangeStatus([FromBody]ChangeStatusModel filter)
+        public ActionResult<IReturnModel<bool>> ChangeStatus([FromBody]ChangeStatusModel filter)
         {
+            if (filter == null)
+                throw new ArgumentNullException(nameof(filter));
+
             #region Declares
 
             IReturnModel<bool> rtn = new ReturnModel<bool>(_logger);
@@ -443,7 +467,7 @@ namespace CSBEF.Module.UserManagement.Controllers
                 var userId = Tools.GetTokenNameClaim(HttpContext);
                 var tokenId = Tools.GetTokenIdClaim(HttpContext);
                 var serviceFilterModel = new ServiceParamsWithIdentifier<ChangeStatusModel>(filter, userId, tokenId);
-                IReturnModel<bool> serviceAction = await _service.ChangeStatus(serviceFilterModel);
+                IReturnModel<bool> serviceAction = _service.ChangeStatus(serviceFilterModel);
                 if (serviceAction.Error.Status)
                     rtn.Error = serviceAction.Error;
                 else
@@ -462,8 +486,11 @@ namespace CSBEF.Module.UserManagement.Controllers
         [Authorize(Roles = "Root, Root.UserManagement, Root.UserManagement.User, Root.UserManagement.User.UserInGroup")]
         [Route("api/UserManagement/User/SaveUserInGroups")]
         [HttpPost]
-        public async Task<ActionResult<IReturnModel<bool>>> SaveUserInGroups([FromBody]SaveUserInGroupsModel filter)
+        public ActionResult<IReturnModel<bool>> SaveUserInGroups([FromBody]SaveUserInGroupsModel filter)
         {
+            if (filter == null)
+                throw new ArgumentNullException(nameof(filter));
+
             #region Declares
 
             IReturnModel<bool> rtn = new ReturnModel<bool>(_logger);
@@ -487,7 +514,7 @@ namespace CSBEF.Module.UserManagement.Controllers
                 var userId = Tools.GetTokenNameClaim(HttpContext);
                 var tokenId = Tools.GetTokenIdClaim(HttpContext);
                 var serviceFilterModel = new ServiceParamsWithIdentifier<SaveUserInGroupsModel>(filter, userId, tokenId);
-                IReturnModel<bool> serviceAction = await _service.SaveUserInGroups(serviceFilterModel);
+                IReturnModel<bool> serviceAction = _service.SaveUserInGroups(serviceFilterModel);
                 if (serviceAction.Error.Status)
                     rtn.Error = serviceAction.Error;
                 else
@@ -506,8 +533,11 @@ namespace CSBEF.Module.UserManagement.Controllers
         [Authorize(Roles = "Root, Root.UserManagement, Root.UserManagement.User, Root.UserManagement.User.ChangeRoles")]
         [Route("api/UserManagement/User/SaveUserInRoles")]
         [HttpPost]
-        public async Task<ActionResult<IReturnModel<bool>>> SaveUserInRoles([FromBody]SaveUserInRolesModel filter)
+        public ActionResult<IReturnModel<bool>> SaveUserInRoles([FromBody]SaveUserInRolesModel filter)
         {
+            if (filter == null)
+                throw new ArgumentNullException(nameof(filter));
+
             #region Declares
 
             IReturnModel<bool> rtn = new ReturnModel<bool>(_logger);
@@ -531,7 +561,7 @@ namespace CSBEF.Module.UserManagement.Controllers
                 var userId = Tools.GetTokenNameClaim(HttpContext);
                 var tokenId = Tools.GetTokenIdClaim(HttpContext);
                 var serviceFilterModel = new ServiceParamsWithIdentifier<SaveUserInRolesModel>(filter, userId, tokenId);
-                IReturnModel<bool> serviceAction = await _service.SaveUserInRoles(serviceFilterModel);
+                IReturnModel<bool> serviceAction = _service.SaveUserInRoles(serviceFilterModel);
                 if (serviceAction.Error.Status)
                     rtn.Error = serviceAction.Error;
                 else

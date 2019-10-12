@@ -5,7 +5,7 @@ namespace CSBEF.Module.UserManagement.Models.Return
 {
     public class UserGroupDetailsModel : GroupDTO
     {
-        public List<int> Roles { get; set; } = new List<int>();
-        public List<int> Users { get; set; } = new List<int>();
+        public List<int> Roles { get; } = new List<int>();
+        public List<int> Users { get; } = new List<int>();
     }
 }

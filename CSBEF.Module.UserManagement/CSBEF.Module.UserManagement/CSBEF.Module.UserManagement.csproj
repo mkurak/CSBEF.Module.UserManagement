@@ -12,12 +12,17 @@
     <RepositoryUrl>https://github.com/mkurak/CSBEF.Module.UserManagement</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
     <PackageTags>CSBEF User Management Module (official)</PackageTags>
-    <Version>1.1.1</Version>
-    <PackageReleaseNotes>- Fixed POCO models</PackageReleaseNotes>
+    <Version>1.1.2</Version>
+    <PackageReleaseNotes>- Clear async operations
+- CSBEF.Core 2.0.5 updated</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CSBEF.Core" Version="2.0.1" />
+    <PackageReference Include="CSBEF.Core" Version="2.0.5" />
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.6">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>

@@ -2,6 +2,7 @@
 using CSBEF.Core.Interfaces;
 using CSBEF.Module.UserManagement.Poco;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace CSBEF.Module.UserManagement
 {
@@ -9,14 +10,13 @@ namespace CSBEF.Module.UserManagement
     {
         public void Build(ModelBuilder modelBuilder)
         {
+            if (modelBuilder == null)
+                throw new ArgumentNullException(nameof(modelBuilder));
+
             switch (GlobalConfiguration.DbProvider)
             {
                 case "mssql":
                     Build_MSSQL(modelBuilder);
-                    break;
-
-                case "postgresql":
-                    Build_PostgreSQL(modelBuilder);
                     break;
             }
         }
@@ -194,10 +194,6 @@ namespace CSBEF.Module.UserManagement
 
                 entity.Property(e => e.ViewDate).HasColumnType("datetime");
             });
-        }
-
-        private void Build_PostgreSQL(ModelBuilder modelBuilder)
-        {
         }
     }
 }

@@ -8,12 +8,12 @@ using CSBEF.Module.UserManagement.Models.DTO;
 using CSBEF.Module.UserManagement.Models.Request;
 using CSBEF.Module.UserManagement.Models.Return;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace CSBEF.Module.UserManagement.Controllers
 {
@@ -44,8 +44,11 @@ namespace CSBEF.Module.UserManagement.Controllers
         [Authorize]
         [Route("api/UserManagement/Group/List")]
         [HttpGet]
-        public async Task<ActionResult<IReturnModel<IList<GroupDTO>>>> List([FromQuery]ActionFilterModel filter)
+        public ActionResult<IReturnModel<IList<GroupDTO>>> List([FromQuery]ActionFilterModel filter)
         {
+            if (filter == null)
+                throw new ArgumentNullException(nameof(filter));
+
             #region Declares
 
             IReturnModel<IList<GroupDTO>> rtn = new ReturnModel<IList<GroupDTO>>(_logger);
@@ -67,7 +70,7 @@ namespace CSBEF.Module.UserManagement.Controllers
             try
             {
                 var userId = Tools.GetTokenNameClaim(HttpContext);
-                IReturnModel<IList<GroupDTO>> serviceAction = await _service.ListAsync(filter);
+                IReturnModel<IList<GroupDTO>> serviceAction = _service.List(filter);
                 if (serviceAction.Error.Status)
                     rtn.Error = serviceAction.Error;
                 else
@@ -86,8 +89,11 @@ namespace CSBEF.Module.UserManagement.Controllers
         [Authorize]
         [Route("api/UserManagement/Group/ListWithDetails")]
         [HttpGet]
-        public async Task<ActionResult<IReturnModel<IList<UserGroupDetailsModel>>>> ListWithDetails([FromQuery]ActionFilterModel filter)
+        public ActionResult<IReturnModel<IList<UserGroupDetailsModel>>> ListWithDetails([FromQuery]ActionFilterModel filter)
         {
+            if (filter == null)
+                throw new ArgumentNullException(nameof(filter));
+
             #region Declares
 
             IReturnModel<IList<UserGroupDetailsModel>> rtn = new ReturnModel<IList<UserGroupDetailsModel>>(_logger);
@@ -111,7 +117,7 @@ namespace CSBEF.Module.UserManagement.Controllers
                 var userId = Tools.GetTokenNameClaim(HttpContext);
                 var tokenId = Tools.GetTokenIdClaim(HttpContext);
                 var serviceFilterModel = new ServiceParamsWithIdentifier<ActionFilterModel>(filter, userId, tokenId);
-                IReturnModel<IList<UserGroupDetailsModel>> serviceAction = await _service.ListWithDetails(serviceFilterModel);
+                IReturnModel<IList<UserGroupDetailsModel>> serviceAction = _service.ListWithDetails(serviceFilterModel);
                 if (serviceAction.Error.Status)
                     rtn.Error = serviceAction.Error;
                 else
@@ -130,8 +136,11 @@ namespace CSBEF.Module.UserManagement.Controllers
         [Authorize(Roles = "Root, Root.UserManagement, Root.UserManagement.Group, Root.UserManagement.Group.Add, Root.UserManagement.Group.Update")]
         [Route("api/UserManagement/Group/Save")]
         [HttpPost]
-        public async Task<ActionResult<IReturnModel<GroupDTO>>> Save([FromBody]SaveGroupModel filter)
+        public ActionResult<IReturnModel<GroupDTO>> Save([FromBody]SaveGroupModel filter)
         {
+            if (filter == null)
+                throw new ArgumentNullException(nameof(filter));
+
             #region Declares
 
             IReturnModel<GroupDTO> rtn = new ReturnModel<GroupDTO>(_logger);
@@ -155,7 +164,7 @@ namespace CSBEF.Module.UserManagement.Controllers
                 var userId = Tools.GetTokenNameClaim(HttpContext);
                 var tokenId = Tools.GetTokenIdClaim(HttpContext);
                 var serviceFilterModel = new ServiceParamsWithIdentifier<SaveGroupModel>(filter, userId, tokenId);
-                IReturnModel<GroupDTO> serviceAction = await _service.Save(serviceFilterModel);
+                IReturnModel<GroupDTO> serviceAction = _service.Save(serviceFilterModel);
                 if (serviceAction.Error.Status)
                     rtn.Error = serviceAction.Error;
                 else
@@ -174,8 +183,11 @@ namespace CSBEF.Module.UserManagement.Controllers
         [Authorize(Roles = "Root, Root.UserManagement, Root.UserManagement.Group, Root.UserManagement.Group.ChangeStatus")]
         [Route("api/UserManagement/Group/ChangeStatus")]
         [HttpPost]
-        public async Task<ActionResult<IReturnModel<bool>>> ChangeStatus([FromBody]ChangeStatusModel filter)
+        public ActionResult<IReturnModel<bool>> ChangeStatus([FromBody]ChangeStatusModel filter)
         {
+            if (filter == null)
+                throw new ArgumentNullException(nameof(filter));
+
             #region Declares
 
             IReturnModel<bool> rtn = new ReturnModel<bool>(_logger);
@@ -199,7 +211,7 @@ namespace CSBEF.Module.UserManagement.Controllers
                 var userId = Tools.GetTokenNameClaim(HttpContext);
                 var tokenId = Tools.GetTokenIdClaim(HttpContext);
                 var serviceFilterModel = new ServiceParamsWithIdentifier<ChangeStatusModel>(filter, userId, tokenId);
-                IReturnModel<bool> serviceAction = await _service.ChangeStatus(serviceFilterModel);
+                IReturnModel<bool> serviceAction = _service.ChangeStatus(serviceFilterModel);
                 if (serviceAction.Error.Status)
                     rtn.Error = serviceAction.Error;
                 else
@@ -218,8 +230,11 @@ namespace CSBEF.Module.UserManagement.Controllers
         [Authorize(Roles = "Root, Root.GroupManagement, Root.GroupManagement.Group, Root.GroupManagement.Group.ChangeRoles")]
         [Route("api/UserManagement/Group/SaveGroupInRoles")]
         [HttpPost]
-        public async Task<ActionResult<IReturnModel<bool>>> SaveGroupInRoles([FromBody]SaveGroupInRoleModel filter)
+        public ActionResult<IReturnModel<bool>> SaveGroupInRoles([FromBody]SaveGroupInRoleModel filter)
         {
+            if (filter == null)
+                throw new ArgumentNullException(nameof(filter));
+
             #region Declares
 
             IReturnModel<bool> rtn = new ReturnModel<bool>(_logger);
@@ -243,7 +258,7 @@ namespace CSBEF.Module.UserManagement.Controllers
                 var GroupId = Tools.GetTokenNameClaim(HttpContext);
                 var tokenId = Tools.GetTokenIdClaim(HttpContext);
                 var serviceFilterModel = new ServiceParamsWithIdentifier<SaveGroupInRoleModel>(filter, GroupId, tokenId);
-                IReturnModel<bool> serviceAction = await _service.SaveGroupInRoles(serviceFilterModel);
+                IReturnModel<bool> serviceAction = _service.SaveGroupInRoles(serviceFilterModel);
                 if (serviceAction.Error.Status)
                     rtn.Error = serviceAction.Error;
                 else

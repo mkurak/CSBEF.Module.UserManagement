@@ -16,7 +16,6 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Threading.Tasks;
 
 namespace CSBEF.Module.UserManagement.Services
 {
@@ -24,8 +23,8 @@ namespace CSBEF.Module.UserManagement.Services
     {
         #region Dependencies
 
-        private IHubContext<GlobalHub> _globalHub;
-        private IUserRepository _userRepository;
+        private readonly IHubContext<GlobalHub> _globalHub;
+        private readonly IUserRepository _userRepository;
 
         #endregion Dependencies
 
@@ -62,8 +61,11 @@ namespace CSBEF.Module.UserManagement.Services
 
         #region Actions
 
-        public async Task<IReturnModel<bool>> SaveViewMessage(ServiceParamsWithIdentifier<ViewMessageModel> args)
+        public IReturnModel<bool> SaveViewMessage(ServiceParamsWithIdentifier<ViewMessageModel> args)
         {
+            if (args == null)
+                throw new ArgumentNullException(nameof(args));
+
             IReturnModel<bool> rtn = new ReturnModel<bool>(_logger);
 
             try
@@ -80,7 +82,7 @@ namespace CSBEF.Module.UserManagement.Services
 
                 #region Before Event Handler
 
-                beforeEventHandler = await _eventService.GetEvent(ModuleName, $"{ServiceName}.SaveViewMessage.Before").EventHandler<bool, ServiceParamsWithIdentifier<ViewMessageModel>>(args);
+                beforeEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.SaveViewMessage.Before").EventHandler<bool, ServiceParamsWithIdentifier<ViewMessageModel>>(args);
                 if (beforeEventHandler != null)
                 {
                     if (beforeEventHandler.Error.Status)
@@ -96,7 +98,7 @@ namespace CSBEF.Module.UserManagement.Services
 
                 if (cnt)
                 {
-                    getMessage = await Repository.FindAsync(i => i.Id == args.Param.MessageId);
+                    getMessage = Repository.Find(i => i.Id == args.Param.MessageId);
                     if (getMessage == null)
                     {
                         rtn = rtn.SendError(UserMessageErrorsEnum.SaveViewMessage_MessageNotFound);
@@ -112,7 +114,7 @@ namespace CSBEF.Module.UserManagement.Services
                     getMessage.UpdatingDate = DateTime.Now;
 
                     Repository.Update(getMessage);
-                    await Repository.SaveAsync();
+                    Repository.Save();
 
                     var sendHubMessageModel = new HubViewedMessageModel
                     {
@@ -121,8 +123,8 @@ namespace CSBEF.Module.UserManagement.Services
                         MessageId = getMessage.Id
                     };
 
-                    await _globalHub.Clients.Group("user_" + getMessage.FromUserId).SendAsync($"{ModuleName}.{ServiceName}.ViewedMessage", sendHubMessageModel);
-                    await _globalHub.Clients.Group("user_" + getMessage.ToUserId).SendAsync($"{ModuleName}.{ServiceName}.ViewedMessage", sendHubMessageModel);
+                    _globalHub.Clients.Group("user_" + getMessage.FromUserId).SendAsync($"{ModuleName}.{ServiceName}.ViewedMessage", sendHubMessageModel);
+                    _globalHub.Clients.Group("user_" + getMessage.ToUserId).SendAsync($"{ModuleName}.{ServiceName}.ViewedMessage", sendHubMessageModel);
                 }
 
                 rtn.Result = cnt;
@@ -141,7 +143,7 @@ namespace CSBEF.Module.UserManagement.Services
                         ServiceName = ServiceName,
                         ActionName = "SaveViewMessage"
                     };
-                    afterEventHandler = await _eventService.GetEvent(ModuleName, $"{ServiceName}.SaveViewMessage.After")
+                    afterEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.SaveViewMessage.After")
                         .EventHandler<bool, IAfterEventParameterModel<IReturnModel<bool>, ServiceParamsWithIdentifier<ViewMessageModel>>>(afterEventParameterModel);
                     if (afterEventHandler != null)
                     {
@@ -177,8 +179,11 @@ namespace CSBEF.Module.UserManagement.Services
             return rtn;
         }
 
-        public async Task<IReturnModel<bool>> AddNewMessage(ServiceParamsWithIdentifier<AddNewMessageModel> args)
+        public IReturnModel<bool> AddNewMessage(ServiceParamsWithIdentifier<AddNewMessageModel> args)
         {
+            if (args == null)
+                throw new ArgumentNullException(nameof(args));
+
             IReturnModel<bool> rtn = new ReturnModel<bool>(_logger);
 
             try
@@ -196,7 +201,7 @@ namespace CSBEF.Module.UserManagement.Services
 
                 #region Before Event Handler
 
-                beforeEventHandler = await _eventService.GetEvent(ModuleName, $"{ServiceName}.AddNewMessage.Before").EventHandler<bool, ServiceParamsWithIdentifier<AddNewMessageModel>>(args);
+                beforeEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.AddNewMessage.Before").EventHandler<bool, ServiceParamsWithIdentifier<AddNewMessageModel>>(args);
                 if (beforeEventHandler != null)
                 {
                     if (beforeEventHandler.Error.Status)
@@ -221,7 +226,7 @@ namespace CSBEF.Module.UserManagement.Services
 
                 if (cnt)
                 {
-                    getFromUser = await _userRepository.FindAsync(i => i.Id == args.Param.FromUserId);
+                    getFromUser = _userRepository.Find(i => i.Id == args.Param.FromUserId);
 
                     if (getFromUser == null)
                     {
@@ -232,7 +237,7 @@ namespace CSBEF.Module.UserManagement.Services
 
                 if (cnt)
                 {
-                    getToUser = await _userRepository.FindAsync(i => i.Id == args.Param.ToUserId);
+                    getToUser = _userRepository.Find(i => i.Id == args.Param.ToUserId);
 
                     if (getToUser == null)
                     {
@@ -258,7 +263,7 @@ namespace CSBEF.Module.UserManagement.Services
                     };
 
                     newMessageModel = Repository.Add(newMessageModel);
-                    await Repository.SaveAsync();
+                    Repository.Save();
 
                     var hubSendDataModel = new NewMessageModel
                     {
@@ -269,8 +274,8 @@ namespace CSBEF.Module.UserManagement.Services
                         SendDate = newMessageModel.AddingDate
                     };
 
-                    await _globalHub.Clients.Group("user_" + getFromUser.Id).SendAsync($"{ModuleName}.{ServiceName}.NewMessage", hubSendDataModel);
-                    await _globalHub.Clients.Group("user_" + getToUser.Id).SendAsync($"{ModuleName}.{ServiceName}.NewMessage", hubSendDataModel);
+                    _globalHub.Clients.Group("user_" + getFromUser.Id).SendAsync($"{ModuleName}.{ServiceName}.NewMessage", hubSendDataModel);
+                    _globalHub.Clients.Group("user_" + getToUser.Id).SendAsync($"{ModuleName}.{ServiceName}.NewMessage", hubSendDataModel);
                 }
 
                 rtn.Result = cnt;
@@ -289,7 +294,7 @@ namespace CSBEF.Module.UserManagement.Services
                         ServiceName = ServiceName,
                         ActionName = "AddNewMessage"
                     };
-                    afterEventHandler = await _eventService.GetEvent(ModuleName, $"{ServiceName}.AddNewMessage.After")
+                    afterEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.AddNewMessage.After")
                         .EventHandler<bool, IAfterEventParameterModel<IReturnModel<bool>, ServiceParamsWithIdentifier<AddNewMessageModel>>>(afterEventParameterModel);
                     if (afterEventHandler != null)
                     {

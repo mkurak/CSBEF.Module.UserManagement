@@ -41,8 +41,11 @@ namespace CSBEF.Module.UserManagement.Controllers
         [Authorize]
         [Route("api/UserManagement/Role/List")]
         [HttpGet]
-        public async Task<ActionResult<IReturnModel<IList<RoleDTO>>>> List([FromQuery]ActionFilterModel filter)
+        public ActionResult<IReturnModel<IList<RoleDTO>>> List([FromQuery]ActionFilterModel filter)
         {
+            if (filter == null)
+                throw new ArgumentNullException(nameof(filter));
+
             #region Declares
 
             IReturnModel<IList<RoleDTO>> rtn = new ReturnModel<IList<RoleDTO>>(_logger);
@@ -64,7 +67,7 @@ namespace CSBEF.Module.UserManagement.Controllers
             try
             {
                 var userId = Tools.GetTokenNameClaim(HttpContext);
-                IReturnModel<IList<RoleDTO>> serviceAction = await _service.ListAsync(filter);
+                IReturnModel<IList<RoleDTO>> serviceAction = _service.List(filter);
                 if (serviceAction.Error.Status)
                     rtn.Error = serviceAction.Error;
                 else
