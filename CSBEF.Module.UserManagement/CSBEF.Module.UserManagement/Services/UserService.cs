@@ -297,7 +297,7 @@ namespace CSBEF.Module.UserManagement.Services
 
                     getUser.ProfilePic = savedFileName.Result;
                     Repository.Update(getUser);
-                    Repository.SaveAsync();
+                    Repository.Save();
 
                     rtn.Result = getUser.ProfilePic;
                 }
@@ -1220,7 +1220,7 @@ namespace CSBEF.Module.UserManagement.Services
                             token.UpdatingUserId = args.UserId;
                             _tokenRepository.Update(token);
                         }
-                        _tokenRepository.SaveAsync();
+                        _tokenRepository.Save();
                     }
                 }
 
@@ -1390,7 +1390,7 @@ namespace CSBEF.Module.UserManagement.Services
                             _tokenRepository.Update(token);
                         }
 
-                        _userInGroupRepository.SaveAsync();
+                        _userInGroupRepository.Save();
                     }
                 }
 

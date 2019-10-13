@@ -246,7 +246,7 @@ namespace CSBEF.Module.UserManagement.Services
                         DeviceKey = args.Param.DeviceKey
                     };
                     saveTokenModel = Repository.Add(saveTokenModel);
-                    Repository.SaveAsync();
+                    Repository.Save();
                 }
 
                 if (cnt && string.IsNullOrWhiteSpace(rtn.Result))

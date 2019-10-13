@@ -311,7 +311,7 @@ namespace CSBEF.Module.UserManagement.Services
                         getData = Repository.Update(getData);
                     }
 
-                    Repository.SaveAsync();
+                    Repository.Save();
 
                     rtn.Result = _mapper.Map<GroupDTO>(getData);
                 }
@@ -461,7 +461,7 @@ namespace CSBEF.Module.UserManagement.Services
                     getData.UpdatingDate = DateTime.Now;
                     getData.UpdatingUserId = args.UserId;
                     getData = Repository.Update(getData);
-                    Repository.SaveAsync();
+                    Repository.Save();
                 }
 
                 if (cnt)
@@ -481,7 +481,7 @@ namespace CSBEF.Module.UserManagement.Services
                                     token.UpdatingUserId = args.UserId;
                                     _tokenRepository.Update(token);
                                 }
-                                _tokenRepository.SaveAsync();
+                                _tokenRepository.Save();
                             }
                         }
                     }
@@ -646,7 +646,7 @@ namespace CSBEF.Module.UserManagement.Services
                         foreach (var data in inRoleRecords)
                             _groupInRoleRepository.Delete(data);
 
-                        _groupInRoleRepository.SaveAsync();
+                        _groupInRoleRepository.Save();
                     }
 
                     if (!string.IsNullOrWhiteSpace(args.Param.Roles))
@@ -671,7 +671,7 @@ namespace CSBEF.Module.UserManagement.Services
                                 }
                             }
 
-                            _groupInRoleRepository.SaveAsync();
+                            _groupInRoleRepository.Save();
                         }
                     }
 

@@ -19,15 +19,15 @@ namespace CSBEF.Module.UserManagement
 
             #region Base Actions
 
-            eventService.AddEvent("TokenService.FirstAsync.Before", "UserManagement", "TokenService", "FirstAsync", EventTypeEnum.before);
-            eventService.AddEvent("TokenService.FirstOrDefaultAsync.Before", "UserManagement", "TokenService", "FirstOrDefaultAsync", EventTypeEnum.before);
-            eventService.AddEvent("TokenService.AnyAsync.Before", "UserManagement", "TokenService", "AnyAsync", EventTypeEnum.before);
-            eventService.AddEvent("TokenService.ListAsync.Before", "UserManagement", "TokenService", "ListAsync", EventTypeEnum.before);
+            eventService.AddEvent("TokenService.First.Before", "UserManagement", "TokenService", "First", EventTypeEnum.before);
+            eventService.AddEvent("TokenService.FirstOrDefault.Before", "UserManagement", "TokenService", "FirstOrDefault", EventTypeEnum.before);
+            eventService.AddEvent("TokenService.Any.Before", "UserManagement", "TokenService", "Any", EventTypeEnum.before);
+            eventService.AddEvent("TokenService.List.Before", "UserManagement", "TokenService", "List", EventTypeEnum.before);
 
-            eventService.AddEvent("TokenService.FirstAsync.After", "UserManagement", "TokenService", "FirstAsync", EventTypeEnum.after);
-            eventService.AddEvent("TokenService.FirstOrDefaultAsync.After", "UserManagement", "TokenService", "FirstOrDefaultAsync", EventTypeEnum.after);
-            eventService.AddEvent("TokenService.AnyAsync.After", "UserManagement", "TokenService", "AnyAsync", EventTypeEnum.after);
-            eventService.AddEvent("TokenService.ListAsync.After", "UserManagement", "TokenService", "ListAsync", EventTypeEnum.after);
+            eventService.AddEvent("TokenService.First.After", "UserManagement", "TokenService", "First", EventTypeEnum.after);
+            eventService.AddEvent("TokenService.FirstOrDefault.After", "UserManagement", "TokenService", "FirstOrDefault", EventTypeEnum.after);
+            eventService.AddEvent("TokenService.Any.After", "UserManagement", "TokenService", "Any", EventTypeEnum.after);
+            eventService.AddEvent("TokenService.List.After", "UserManagement", "TokenService", "List", EventTypeEnum.after);
 
             #endregion Base Actions
 
@@ -47,15 +47,15 @@ namespace CSBEF.Module.UserManagement
 
             #region Base Actions
 
-            eventService.AddEvent("UserService.FirstAsync.Before", "UserManagement", "UserService", "FirstAsync", EventTypeEnum.before);
-            eventService.AddEvent("UserService.FirstOrDefaultAsync.Before", "UserManagement", "UserService", "FirstOrDefaultAsync", EventTypeEnum.before);
-            eventService.AddEvent("UserService.AnyAsync.Before", "UserManagement", "UserService", "AnyAsync", EventTypeEnum.before);
-            eventService.AddEvent("UserService.ListAsync.Before", "UserManagement", "UserService", "ListAsync", EventTypeEnum.before);
+            eventService.AddEvent("UserService.First.Before", "UserManagement", "UserService", "First", EventTypeEnum.before);
+            eventService.AddEvent("UserService.FirstOrDefault.Before", "UserManagement", "UserService", "FirstOrDefault", EventTypeEnum.before);
+            eventService.AddEvent("UserService.Any.Before", "UserManagement", "UserService", "Any", EventTypeEnum.before);
+            eventService.AddEvent("UserService.List.Before", "UserManagement", "UserService", "List", EventTypeEnum.before);
 
-            eventService.AddEvent("UserService.FirstAsync.After", "UserManagement", "UserService", "FirstAsync", EventTypeEnum.after);
-            eventService.AddEvent("UserService.FirstOrDefaultAsync.After", "UserManagement", "UserService", "FirstOrDefaultAsync", EventTypeEnum.after);
-            eventService.AddEvent("UserService.AnyAsync.After", "UserManagement", "UserService", "AnyAsync", EventTypeEnum.after);
-            eventService.AddEvent("UserService.ListAsync.After", "UserManagement", "UserService", "ListAsync", EventTypeEnum.after);
+            eventService.AddEvent("UserService.First.After", "UserManagement", "UserService", "First", EventTypeEnum.after);
+            eventService.AddEvent("UserService.FirstOrDefault.After", "UserManagement", "UserService", "FirstOrDefault", EventTypeEnum.after);
+            eventService.AddEvent("UserService.Any.After", "UserManagement", "UserService", "Any", EventTypeEnum.after);
+            eventService.AddEvent("UserService.List.After", "UserManagement", "UserService", "List", EventTypeEnum.after);
 
             #endregion Base Actions
 
@@ -89,15 +89,15 @@ namespace CSBEF.Module.UserManagement
 
             #region Base Actions
 
-            eventService.AddEvent("UserMessageService.FirstAsync.Before", "UserManagement", "UserMessageService", "FirstAsync", EventTypeEnum.before);
-            eventService.AddEvent("UserMessageService.FirstOrDefaultAsync.Before", "UserManagement", "UserMessageService", "FirstOrDefaultAsync", EventTypeEnum.before);
-            eventService.AddEvent("UserMessageService.AnyAsync.Before", "UserManagement", "UserMessageService", "AnyAsync", EventTypeEnum.before);
-            eventService.AddEvent("UserMessageService.ListAsync.Before", "UserManagement", "UserMessageService", "ListAsync", EventTypeEnum.before);
+            eventService.AddEvent("UserMessageService.First.Before", "UserManagement", "UserMessageService", "First", EventTypeEnum.before);
+            eventService.AddEvent("UserMessageService.FirstOrDefault.Before", "UserManagement", "UserMessageService", "FirstOrDefault", EventTypeEnum.before);
+            eventService.AddEvent("UserMessageService.Any.Before", "UserManagement", "UserMessageService", "Any", EventTypeEnum.before);
+            eventService.AddEvent("UserMessageService.List.Before", "UserManagement", "UserMessageService", "List", EventTypeEnum.before);
 
-            eventService.AddEvent("UserMessageService.FirstAsync.After", "UserManagement", "UserMessageService", "FirstAsync", EventTypeEnum.after);
-            eventService.AddEvent("UserMessageService.FirstOrDefaultAsync.After", "UserManagement", "UserMessageService", "FirstOrDefaultAsync", EventTypeEnum.after);
-            eventService.AddEvent("UserMessageService.AnyAsync.After", "UserManagement", "UserMessageService", "AnyAsync", EventTypeEnum.after);
-            eventService.AddEvent("UserMessageService.ListAsync.After", "UserManagement", "UserMessageService", "ListAsync", EventTypeEnum.after);
+            eventService.AddEvent("UserMessageService.First.After", "UserManagement", "UserMessageService", "First", EventTypeEnum.after);
+            eventService.AddEvent("UserMessageService.FirstOrDefault.After", "UserManagement", "UserMessageService", "FirstOrDefault", EventTypeEnum.after);
+            eventService.AddEvent("UserMessageService.Any.After", "UserManagement", "UserMessageService", "Any", EventTypeEnum.after);
+            eventService.AddEvent("UserMessageService.List.After", "UserManagement", "UserMessageService", "List", EventTypeEnum.after);
 
             #endregion Base Actions
 
@@ -115,15 +115,15 @@ namespace CSBEF.Module.UserManagement
 
             #region Base Actions
 
-            eventService.AddEvent("RoleService.FirstAsync.Before", "UserManagement", "RoleService", "FirstAsync", EventTypeEnum.before);
-            eventService.AddEvent("RoleService.FirstOrDefaultAsync.Before", "UserManagement", "RoleService", "FirstOrDefaultAsync", EventTypeEnum.before);
-            eventService.AddEvent("RoleService.AnyAsync.Before", "UserManagement", "RoleService", "AnyAsync", EventTypeEnum.before);
-            eventService.AddEvent("RoleService.ListAsync.Before", "UserManagement", "RoleService", "ListAsync", EventTypeEnum.before);
+            eventService.AddEvent("RoleService.First.Before", "UserManagement", "RoleService", "First", EventTypeEnum.before);
+            eventService.AddEvent("RoleService.FirstOrDefault.Before", "UserManagement", "RoleService", "FirstOrDefault", EventTypeEnum.before);
+            eventService.AddEvent("RoleService.Any.Before", "UserManagement", "RoleService", "Any", EventTypeEnum.before);
+            eventService.AddEvent("RoleService.List.Before", "UserManagement", "RoleService", "List", EventTypeEnum.before);
 
-            eventService.AddEvent("RoleService.FirstAsync.After", "UserManagement", "RoleService", "FirstAsync", EventTypeEnum.after);
-            eventService.AddEvent("RoleService.FirstOrDefaultAsync.After", "UserManagement", "RoleService", "FirstOrDefaultAsync", EventTypeEnum.after);
-            eventService.AddEvent("RoleService.AnyAsync.After", "UserManagement", "RoleService", "AnyAsync", EventTypeEnum.after);
-            eventService.AddEvent("RoleService.ListAsync.After", "UserManagement", "RoleService", "ListAsync", EventTypeEnum.after);
+            eventService.AddEvent("RoleService.First.After", "UserManagement", "RoleService", "First", EventTypeEnum.after);
+            eventService.AddEvent("RoleService.FirstOrDefault.After", "UserManagement", "RoleService", "FirstOrDefault", EventTypeEnum.after);
+            eventService.AddEvent("RoleService.Any.After", "UserManagement", "RoleService", "Any", EventTypeEnum.after);
+            eventService.AddEvent("RoleService.List.After", "UserManagement", "RoleService", "List", EventTypeEnum.after);
 
             #endregion Base Actions
 
@@ -133,15 +133,15 @@ namespace CSBEF.Module.UserManagement
 
             #region Base Actions
 
-            eventService.AddEvent("RoleService.FirstAsync.Before", "UserManagement", "RoleService", "FirstAsync", EventTypeEnum.before);
-            eventService.AddEvent("RoleService.FirstOrDefaultAsync.Before", "UserManagement", "RoleService", "FirstOrDefaultAsync", EventTypeEnum.before);
-            eventService.AddEvent("RoleService.AnyAsync.Before", "UserManagement", "RoleService", "AnyAsync", EventTypeEnum.before);
-            eventService.AddEvent("RoleService.ListAsync.Before", "UserManagement", "RoleService", "ListAsync", EventTypeEnum.before);
+            eventService.AddEvent("RoleService.First.Before", "UserManagement", "RoleService", "First", EventTypeEnum.before);
+            eventService.AddEvent("RoleService.FirstOrDefault.Before", "UserManagement", "RoleService", "FirstOrDefault", EventTypeEnum.before);
+            eventService.AddEvent("RoleService.Any.Before", "UserManagement", "RoleService", "Any", EventTypeEnum.before);
+            eventService.AddEvent("RoleService.List.Before", "UserManagement", "RoleService", "List", EventTypeEnum.before);
 
-            eventService.AddEvent("RoleService.FirstAsync.After", "UserManagement", "RoleService", "FirstAsync", EventTypeEnum.after);
-            eventService.AddEvent("RoleService.FirstOrDefaultAsync.After", "UserManagement", "RoleService", "FirstOrDefaultAsync", EventTypeEnum.after);
-            eventService.AddEvent("RoleService.AnyAsync.After", "UserManagement", "RoleService", "AnyAsync", EventTypeEnum.after);
-            eventService.AddEvent("RoleService.ListAsync.After", "UserManagement", "RoleService", "ListAsync", EventTypeEnum.after);
+            eventService.AddEvent("RoleService.First.After", "UserManagement", "RoleService", "First", EventTypeEnum.after);
+            eventService.AddEvent("RoleService.FirstOrDefault.After", "UserManagement", "RoleService", "FirstOrDefault", EventTypeEnum.after);
+            eventService.AddEvent("RoleService.Any.After", "UserManagement", "RoleService", "Any", EventTypeEnum.after);
+            eventService.AddEvent("RoleService.List.After", "UserManagement", "RoleService", "List", EventTypeEnum.after);
 
             #endregion Base Actions
 
@@ -151,15 +151,15 @@ namespace CSBEF.Module.UserManagement
 
             #region Base Actions
 
-            eventService.AddEvent("GroupService.FirstAsync.Before", "UserManagement", "GroupService", "FirstAsync", EventTypeEnum.before);
-            eventService.AddEvent("GroupService.FirstOrDefaultAsync.Before", "UserManagement", "GroupService", "FirstOrDefaultAsync", EventTypeEnum.before);
-            eventService.AddEvent("GroupService.AnyAsync.Before", "UserManagement", "GroupService", "AnyAsync", EventTypeEnum.before);
-            eventService.AddEvent("GroupService.ListAsync.Before", "UserManagement", "GroupService", "ListAsync", EventTypeEnum.before);
+            eventService.AddEvent("GroupService.First.Before", "UserManagement", "GroupService", "First", EventTypeEnum.before);
+            eventService.AddEvent("GroupService.FirstOrDefault.Before", "UserManagement", "GroupService", "FirstOrDefault", EventTypeEnum.before);
+            eventService.AddEvent("GroupService.Any.Before", "UserManagement", "GroupService", "Any", EventTypeEnum.before);
+            eventService.AddEvent("GroupService.List.Before", "UserManagement", "GroupService", "List", EventTypeEnum.before);
 
-            eventService.AddEvent("GroupService.FirstAsync.After", "UserManagement", "GroupService", "FirstAsync", EventTypeEnum.after);
-            eventService.AddEvent("GroupService.FirstOrDefaultAsync.After", "UserManagement", "GroupService", "FirstOrDefaultAsync", EventTypeEnum.after);
-            eventService.AddEvent("GroupService.AnyAsync.After", "UserManagement", "GroupService", "AnyAsync", EventTypeEnum.after);
-            eventService.AddEvent("GroupService.ListAsync.After", "UserManagement", "GroupService", "ListAsync", EventTypeEnum.after);
+            eventService.AddEvent("GroupService.First.After", "UserManagement", "GroupService", "First", EventTypeEnum.after);
+            eventService.AddEvent("GroupService.FirstOrDefault.After", "UserManagement", "GroupService", "FirstOrDefault", EventTypeEnum.after);
+            eventService.AddEvent("GroupService.Any.After", "UserManagement", "GroupService", "Any", EventTypeEnum.after);
+            eventService.AddEvent("GroupService.List.After", "UserManagement", "GroupService", "List", EventTypeEnum.after);
 
             #endregion Base Actions
 
