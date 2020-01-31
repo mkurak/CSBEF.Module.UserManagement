@@ -45,6 +45,7 @@ namespace CSBEF.Module.UserManagement.Services
             IMapper mapper,
             ITokenRepository repository,
             IEventService eventService,
+            IHubSyncDataService hubSyncDataService,
 
             // Other Repository Dependencies
             IUserRepository userRepository,
@@ -59,6 +60,7 @@ namespace CSBEF.Module.UserManagement.Services
             mapper,
             repository,
             eventService,
+            hubSyncDataService,
             "UserManagement",
             "TokenService"
         )

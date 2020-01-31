@@ -21,7 +21,8 @@ namespace CSBEF.Module.UserManagement.Services
            ILogger<ILog> logger,
            IMapper mapper,
            IRoleRepository repository,
-           IEventService eventService
+           IEventService eventService,
+           IHubSyncDataService hubSyncDataService
 
         // Other Repository Dependencies
         ) : base(
@@ -31,6 +32,7 @@ namespace CSBEF.Module.UserManagement.Services
            mapper,
            repository,
            eventService,
+           hubSyncDataService,
            "UserManagement",
            "RoleService"
         )

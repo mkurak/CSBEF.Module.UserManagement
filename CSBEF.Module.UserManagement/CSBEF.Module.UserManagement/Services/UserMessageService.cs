@@ -37,6 +37,7 @@ namespace CSBEF.Module.UserManagement.Services
            IMapper mapper,
            IUserMessageRepository repository,
            IEventService eventService,
+           IHubSyncDataService hubSyncDataService,
 
             // Other Repository Dependencies
             IUserRepository userRepository,
@@ -49,6 +50,7 @@ namespace CSBEF.Module.UserManagement.Services
            mapper,
            repository,
            eventService,
+           hubSyncDataService,
            "UserManagement",
            "UserMessageService"
         )

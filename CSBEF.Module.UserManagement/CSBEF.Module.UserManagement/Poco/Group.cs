@@ -1,5 +1,4 @@
 ﻿using CSBEF.Core.Models;
-using System.Collections.Generic;
 
 namespace CSBEF.Module.UserManagement.Poco
 {

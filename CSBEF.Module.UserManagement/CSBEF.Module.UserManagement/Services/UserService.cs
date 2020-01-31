@@ -62,6 +62,7 @@ namespace CSBEF.Module.UserManagement.Services
            mapper,
            repository,
            eventService,
+           hubSyncDataService,
            "UserManagement",
            "UserService"
         )
@@ -288,7 +289,7 @@ namespace CSBEF.Module.UserManagement.Services
                 {
                     if (!string.IsNullOrWhiteSpace(getUser.ProfilePic))
                     {
-                        if(getUser.ProfilePic != "default.jpg")
+                        if (getUser.ProfilePic != "default.jpg")
                         {
                             targetRemoveFile = Path.Combine(uploaderRootPath, getUser.ProfilePic);
                             File.Delete(targetRemoveFile);
@@ -447,7 +448,7 @@ namespace CSBEF.Module.UserManagement.Services
                 {
                     if (!string.IsNullOrWhiteSpace(getUser.ProfileBgPic))
                     {
-                        if(getUser.ProfileBgPic != "default.jpg")
+                        if (getUser.ProfileBgPic != "default.jpg")
                         {
                             targetRemoveFile = Path.Combine(uploaderRootPath, getUser.ProfilePic);
                             File.Delete(targetRemoveFile);
@@ -709,7 +710,7 @@ namespace CSBEF.Module.UserManagement.Services
 
                 #region Action Body
 
-                
+
                 if (cnt)
                 {
                     modelValidation = args.Param.ModelValidation();

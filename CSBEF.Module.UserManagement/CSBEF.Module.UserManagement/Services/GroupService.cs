@@ -56,6 +56,7 @@ namespace CSBEF.Module.UserManagement.Services
            mapper,
            repository,
            eventService,
+           hubSyncDataService,
            "UserManagement",
            "GroupService"
         )

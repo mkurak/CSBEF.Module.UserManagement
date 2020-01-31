@@ -8,7 +8,6 @@ using CSBEF.Module.UserManagement.Models.DTO;
 using CSBEF.Module.UserManagement.Models.Request;
 using CSBEF.Module.UserManagement.Models.Return;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
