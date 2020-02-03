@@ -1670,7 +1670,7 @@ namespace CSBEF.Module.UserManagement.Services
                 if (cnt)
                 {
                     user = _mapper.Map<UserDTO>(getData);
-                    user.Password = "";
+                    user.Password = string.Empty;
 
                     userDetailsModel = new UserDetailsModel
                     {

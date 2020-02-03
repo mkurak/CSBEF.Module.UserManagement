@@ -83,7 +83,7 @@ namespace CSBEF.Module.UserManagement.Services
 
             IReturnModel<string> rtn = new ReturnModel<string>(_logger)
             {
-                Result = ""
+                Result = string.Empty
             };
 
             try
@@ -260,7 +260,7 @@ namespace CSBEF.Module.UserManagement.Services
                         Audience = "CSBEF",
                         Issuer = "JWT.CSBEF",
                         Subject = new ClaimsIdentity(new Claim[] {
-                        new Claim(ClaimTypes.Name, getUser.Id.ToStringNotNull("")),
+                        new Claim(ClaimTypes.Name, getUser.Id.ToStringNotNull(string.Empty)),
                         new Claim(ClaimTypes.Email, getUser.Email),
                         new Claim(ClaimTypes.GivenName, args.Param.Device),
                         new Claim(ClaimTypes.SerialNumber, args.Param.DeviceKey),
@@ -269,7 +269,7 @@ namespace CSBEF.Module.UserManagement.Services
                         new Claim("ProfilePic", getUser.ProfilePic),
                         new Claim("ProfileBgPic", getUser.ProfileBgPic),
                         new Claim("ProfileStatusMessage", getUser.ProfileStatusMessage),
-                        new Claim("TokenId", saveTokenModel.Id.ToStringNotNull(""))
+                        new Claim("TokenId", saveTokenModel.Id.ToStringNotNull(string.Empty))
                     }),
                         Expires = DateTime.UtcNow.AddDays(_configuration["AppSettings:JWTSettings:ExpireDays"].ToInt(365)),
                         SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)

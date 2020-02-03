@@ -242,7 +242,7 @@ namespace CSBEF.Module.UserManagement.Controllers
                     rtn.Result = serviceAction.Result;
 
                 if (rtn.Result != null)
-                    rtn.Result.Password = "";
+                    rtn.Result.Password = string.Empty;
             }
             catch (Exception ex)
             {
@@ -281,7 +281,7 @@ namespace CSBEF.Module.UserManagement.Controllers
                 {
                     foreach (var result in rtn.Result)
                     {
-                        result.Password = "";
+                        result.Password = string.Empty;
                     }
                 }
             }
