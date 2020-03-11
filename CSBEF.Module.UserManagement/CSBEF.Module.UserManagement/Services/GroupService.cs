@@ -30,7 +30,6 @@ namespace CSBEF.Module.UserManagement.Services
         private readonly IGroupInRoleRepository _groupInRoleRepository;
         private readonly IUserInGroupRepository _userInGroupRepository;
         private readonly ITokenRepository _tokenRepository;
-        private readonly IHubSyncDataService _hubSyncDataService;
 
         #endregion Dependencies
 
@@ -64,7 +63,6 @@ namespace CSBEF.Module.UserManagement.Services
             _groupInRoleRepository = groupInRoleRepository;
             _userInGroupRepository = userInGroupRepository;
             _tokenRepository = tokenRepository;
-            _hubSyncDataService = hubSyncDataService;
         }
 
         #endregion ctor

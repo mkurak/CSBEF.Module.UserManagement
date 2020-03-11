@@ -35,7 +35,10 @@ namespace CSBEF.Module.UserManagement
                     .IsRequired()
                     .HasMaxLength(256);
 
-                entity.Property(e => e.Status).HasDefaultValueSql("((1))");
+                entity.Property(e => e.Status)
+                    .HasDefaultValueSql("((1))")
+                    .ValueGeneratedNever()
+                    .HasComment("Durum bilgisidir. True: Kayıt aktif, False: Kayıt pasif");
 
                 entity.Property(e => e.UpdatingDate)
                     .HasColumnType("datetime")
@@ -50,7 +53,10 @@ namespace CSBEF.Module.UserManagement
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.Status).HasDefaultValueSql("((1))");
+                entity.Property(e => e.Status)
+                    .HasDefaultValueSql("((1))")
+                    .ValueGeneratedNever()
+                    .HasComment("Durum bilgisidir. True: Kayıt aktif, False: Kayıt pasif");
 
                 entity.Property(e => e.UpdatingDate)
                     .HasColumnType("datetime")
@@ -69,7 +75,10 @@ namespace CSBEF.Module.UserManagement
 
                 entity.Property(e => e.RoleTitle).HasMaxLength(256);
 
-                entity.Property(e => e.Status).HasDefaultValueSql("((1))");
+                entity.Property(e => e.Status)
+                    .HasDefaultValueSql("((1))")
+                    .ValueGeneratedNever()
+                    .HasComment("Durum bilgisidir. True: Kayıt aktif, False: Kayıt pasif");
 
                 entity.Property(e => e.UpdatingDate)
                     .HasColumnType("datetime")
@@ -96,7 +105,10 @@ namespace CSBEF.Module.UserManagement
 
                 entity.Property(e => e.NotificationToken).HasMaxLength(256);
 
-                entity.Property(e => e.Status).HasDefaultValueSql("((1))");
+                entity.Property(e => e.Status)
+                    .HasDefaultValueSql("((1))")
+                    .ValueGeneratedNever()
+                    .HasComment("Durum bilgisidir. True: Kayıt aktif, False: Kayıt pasif");
 
                 entity.Property(e => e.TokenCode).IsRequired();
 
@@ -129,7 +141,10 @@ namespace CSBEF.Module.UserManagement
 
                 entity.Property(e => e.ProfileStatusMessage).HasMaxLength(512);
 
-                entity.Property(e => e.Status).HasDefaultValueSql("((1))");
+                entity.Property(e => e.Status)
+                    .HasDefaultValueSql("((1))")
+                    .ValueGeneratedNever()
+                    .HasComment("Durum bilgisidir. True: Kayıt aktif, False: Kayıt pasif");
 
                 entity.Property(e => e.Surname).HasMaxLength(256);
 
@@ -148,7 +163,10 @@ namespace CSBEF.Module.UserManagement
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.Status).HasDefaultValueSql("((1))");
+                entity.Property(e => e.Status)
+                    .HasDefaultValueSql("((1))")
+                    .ValueGeneratedNever()
+                    .HasComment("Durum bilgisidir. True: Kayıt aktif, False: Kayıt pasif");
 
                 entity.Property(e => e.UpdatingDate)
                     .HasColumnType("datetime")
@@ -163,7 +181,10 @@ namespace CSBEF.Module.UserManagement
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.Status).HasDefaultValueSql("((1))");
+                entity.Property(e => e.Status)
+                    .HasDefaultValueSql("((1))")
+                    .ValueGeneratedNever()
+                    .HasComment("Durum bilgisidir. True: Kayıt aktif, False: Kayıt pasif");
 
                 entity.Property(e => e.UpdatingDate)
                     .HasColumnType("datetime")
@@ -186,7 +207,10 @@ namespace CSBEF.Module.UserManagement
                     .IsRequired()
                     .HasMaxLength(4000);
 
-                entity.Property(e => e.Status).HasDefaultValueSql("((1))");
+                entity.Property(e => e.Status)
+                    .HasDefaultValueSql("((1))")
+                    .ValueGeneratedNever()
+                    .HasComment("Durum bilgisidir. True: Kayıt aktif, False: Kayıt pasif");
 
                 entity.Property(e => e.UpdatingDate)
                     .HasColumnType("datetime")
