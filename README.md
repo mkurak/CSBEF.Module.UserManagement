@@ -2,9 +2,7 @@
 It is a user management module developed for CSBEF structure.
 
 # Current Version
-Pre-Release: 1.2.4 ([latest release](https://github.com/mkurak/CSBEF.Module.UserManagement/releases/tag/1.2.4))
-<br>
-Release: 1.1.3 ([latest release](https://github.com/mkurak/CSBEF.Module.UserManagement/releases/tag/1.1.3))
+Release: 3.1.0 ([latest release](https://github.com/mkurak/CSBEF.Module.UserManagement/releases/tag/3.1.0))
 
 # Nuget
 ([CSBEF.Module.UserManagement](https://www.nuget.org/packages/CSBEF.Module.UserManagement/))
