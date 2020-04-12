@@ -1,0 +1,51 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Authors>Mesut Kurak</Authors>
+    <Company>Code Scientific</Company>
+    <Description>It is a user management module developed for CSBEF structure.</Description>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageProjectUrl>https://github.com/mkurak/CSBEF.Module.UserManagement</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/mkurak/CSBEF.Module.UserManagement</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
+    <PackageTags>CSBEF User Management Module (official)</PackageTags>
+    <Version>3.1.0</Version>
+    <PackageReleaseNotes>
+      - Complated 3.1 Version
+      - Updated CSBEF dependency (3.1)
+      - All chat related processes have been removed (since it will also be developed as a module)
+      - Some bugs fixed
+      - Hash mechanism removed (for removed from CSBEF)
+      - Made some changes to the folder and file structure
+    </PackageReleaseNotes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Concretes\**" />
+    <EmbeddedResource Remove="Concretes\**" />
+    <None Remove="Concretes\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CSBEF.Core" Version="3.1.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <!-- <ItemGroup>
+    <ProjectReference Include="..\..\CSBEF\CSBEF.Core\CSBEF.Core.csproj" />
+  </ItemGroup> -->
+
+  <ItemGroup>
+    <None Include="LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>
