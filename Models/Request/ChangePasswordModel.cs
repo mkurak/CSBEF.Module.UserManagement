@@ -1,16 +1,18 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CSBEF.Core.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace CSBEF.Module.UserManagement.Models.Request
 {
-    public class ChangePasswordModel {
-        [Required (ErrorMessage = "ModelValidationError_UserIdRequired")]
-        [Range (minimum: 1, maximum: int.MaxValue, ErrorMessage = "ModelValidationError_UserIdIsZero")]
+    public class ChangePasswordModel : HashControlModel
+    {
+        [Required(ErrorMessage = "ModelValidationError_UserIdRequired")]
+        [Range(minimum: 1, maximum: int.MaxValue, ErrorMessage = "ModelValidationError_UserIdIsZero")]
         public int UserId { get; set; }
 
-        [Required (ErrorMessage = "ModelValidationError_CurrentPassRequired")]
+        [Required(ErrorMessage = "ModelValidationError_CurrentPassRequired")]
         public string CurrentPass { get; set; }
 
-        [Required (ErrorMessage = "ModelValidationError_NewPassRequired")]
+        [Required(ErrorMessage = "ModelValidationError_NewPassRequired")]
         public string NewPass { get; set; }
     }
 }

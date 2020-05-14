@@ -1,8 +1,10 @@
-﻿using System;
-using CSBEF.Core.Models;
+﻿using CSBEF.Core.Models;
+using System;
 
-namespace CSBEF.Module.UserManagement.Poco {
-    public partial class Token : EntityModelBase {
+namespace CSBEF.Module.UserManagement.Poco
+{
+    public partial class Token : EntityModelBase
+    {
         public int UserId { get; set; }
         public string NotificationToken { get; set; }
         public string TokenCode { get; set; }

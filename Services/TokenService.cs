@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading;
-using AutoMapper;
+﻿using AutoMapper;
 using CSBEF.Core.Abstracts;
 using CSBEF.Core.Concretes;
 using CSBEF.Core.Enums;
@@ -22,9 +15,17 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Security.Claims;
+using System.Text;
 
-namespace CSBEF.Module.UserManagement.Services {
-    public class TokenService : ServiceBase<Token, TokenDTO>, ITokenService {
+namespace CSBEF.Module.UserManagement.Services
+{
+    public class TokenService : ServiceBase<Token, TokenDTO>, ITokenService
+    {
         #region Other Repositories
 
         private readonly IUserRepository _userRepository;
@@ -37,10 +38,10 @@ namespace CSBEF.Module.UserManagement.Services {
 
         #region ctor
 
-        public TokenService (
+        public TokenService(
             IWebHostEnvironment hostingEnvironment,
             IConfiguration configuration,
-            ILogger<IReturnModel<bool>> logger,
+            ILogger<ILog> logger,
             IMapper mapper,
             ITokenRepository repository,
             IEventService eventService,
@@ -52,7 +53,7 @@ namespace CSBEF.Module.UserManagement.Services {
             IGroupInRoleRepository groupInRoleRepository,
             IUserInRoleRepository userInRoleRepository,
             IRoleRepository roleRepository
-        ) : base (
+        ) : base(
             hostingEnvironment,
             configuration,
             logger,
@@ -62,7 +63,8 @@ namespace CSBEF.Module.UserManagement.Services {
             hubSyncDataService,
             "UserManagement",
             "TokenService"
-        ) {
+        )
+        {
             _userRepository = userRepository;
             _userInGroupRepository = userInGroupRepository;
             _groupInRoleRepository = groupInRoleRepository;
@@ -74,15 +76,18 @@ namespace CSBEF.Module.UserManagement.Services {
 
         #region Public Actions
 
-        public IReturnModel<string> CreateToken (ServiceParamsWithIdentifier<CreateTokenModel> args) {
+        public IReturnModel<string> CreateToken(ServiceParamsWithIdentifier<CreateTokenModel> args)
+        {
             if (args == null)
-                throw new ArgumentNullException (nameof (args));
+                throw new ArgumentNullException(nameof(args));
 
-            IReturnModel<string> rtn = new ReturnModel<string> (Logger) {
+            IReturnModel<string> rtn = new ReturnModel<string>(_logger)
+            {
                 Result = string.Empty
             };
 
-            try {
+            try
+            {
                 #region Variables
 
                 bool cnt = true;
@@ -98,15 +103,18 @@ namespace CSBEF.Module.UserManagement.Services {
                 SecurityToken token = null;
                 string tokenString = null;
                 Token saveTokenModel = null;
+                string passwordHashSecureKey = _configuration["HashSecureKeys:Password"];
 
                 #endregion Variables
 
                 #region Before Event Handler
 
-                beforeEventHandler = EventService.GetEvent (ModuleName, $"{ServiceName}.CreateToken.Before").EventHandler<bool, ServiceParamsWithIdentifier<CreateTokenModel>> (args);
-                if (beforeEventHandler != null) {
-                    if (beforeEventHandler.ErrorInfo.Status) {
-                        rtn.ErrorInfo = beforeEventHandler.ErrorInfo;
+                beforeEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.CreateToken.Before").EventHandler<bool, ServiceParamsWithIdentifier<CreateTokenModel>>(args);
+                if (beforeEventHandler != null)
+                {
+                    if (beforeEventHandler.Error.Status)
+                    {
+                        rtn.Error = beforeEventHandler.Error;
                         cnt = false;
                     }
                 }
@@ -115,91 +123,119 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region Action Body
 
-                if (cnt) {
-                    if (args == null) {
-                        rtn = rtn.SendError (TokenErrorsEnum.CreateTokenArgsNull);
+                if (cnt)
+                {
+                    if (args == null)
+                    {
+                        rtn = rtn.SendError(TokenErrorsEnum.CreateToken_ArgsNull);
                         cnt = false;
                     }
                 }
 
-                if (cnt) {
-                    if (args.Param == null) {
-                        rtn = rtn.SendError (TokenErrorsEnum.CreateTokenArgsParamNull);
+                if (cnt)
+                {
+                    if (args.Param == null)
+                    {
+                        rtn = rtn.SendError(TokenErrorsEnum.CreateToken_ArgsParamNull);
                         cnt = false;
                     }
                 }
 
-                if (cnt) {
-                    if (!string.IsNullOrWhiteSpace (args.Param.UserName)) {
-                        if (!args.Param.UserName.UserNameIsValid ()) {
-                            rtn = rtn.SendError (TokenErrorsEnum.CreateTokenUserNameInValid);
+                if (cnt)
+                {
+                    if (!string.IsNullOrWhiteSpace(args.Param.UserName))
+                    {
+                        if (!args.Param.UserName.UserNameIsValid())
+                        {
+                            rtn = rtn.SendError(TokenErrorsEnum.CreateToken_UserNameInValid);
                             cnt = false;
                         }
-                    } else {
-                        if (!args.Param.Email.IsValidEmail ()) {
-                            rtn = rtn.SendError (TokenErrorsEnum.CreateTokenEmailInValid);
-                            cnt = false;
-                        }
                     }
-                }
-
-                if (cnt) {
-                    if (string.IsNullOrWhiteSpace (args.Param.Device)) {
-                        rtn = rtn.SendError (TokenErrorsEnum.CreateTokenDeviceEmpty);
-                        cnt = false;
-                    }
-                }
-
-                if (cnt) {
-                    if (string.IsNullOrWhiteSpace (args.Param.DeviceKey)) {
-                        rtn = rtn.SendError (TokenErrorsEnum.CreateTokenDeviceKeyEmpty);
-                        cnt = false;
-                    }
-                }
-
-                if (cnt) {
-                    if (!string.IsNullOrWhiteSpace (args.Param.UserName)) {
-                        getUser = _userRepository.GetAll ().FirstOrDefault (i => i.UserName == args.Param.UserName);
-                        if (getUser == null) {
-                            rtn = rtn.SendError (TokenErrorsEnum.CreateTokenUserNotFound);
-                            cnt = false;
-                        }
-                    } else {
-                        getUser = _userRepository.GetAll ().FirstOrDefault (i => i.Email == args.Param.Email);
-                        if (getUser == null) {
-                            rtn = rtn.SendError (TokenErrorsEnum.CreateTokenUserNotFound);
+                    else
+                    {
+                        if (!args.Param.Email.IsValidEmail())
+                        {
+                            rtn = rtn.SendError(TokenErrorsEnum.CreateToken_EmailInValid);
                             cnt = false;
                         }
                     }
                 }
 
-                if (cnt) {
-                    getUser.Password = getUser.Password.ToUpper (Thread.CurrentThread.CurrentCulture);
-                    args.Param.Password = Tools.ComputeSha256Hash(args.Param.Password).ToUpper (Thread.CurrentThread.CurrentCulture);
-
-                    if (getUser.Password != args.Param.Password) {
+                if (cnt)
+                {
+                    if (string.IsNullOrWhiteSpace(args.Param.Device))
+                    {
+                        rtn = rtn.SendError(TokenErrorsEnum.CreateToken_DeviceEmpty);
                         cnt = false;
-                        rtn = rtn.SendError (TokenErrorsEnum.CreateTokenWrongPass);
                     }
                 }
 
-                if (cnt) {
-                    getToken = Repository.GetAll ().FirstOrDefault (i => i.UserId == getUser.Id && i.DeviceKey == args.Param.DeviceKey && i.Status == true);
-                    if (getToken != null) {
+                if (cnt)
+                {
+                    if (string.IsNullOrWhiteSpace(args.Param.DeviceKey))
+                    {
+                        rtn = rtn.SendError(TokenErrorsEnum.CreateToken_DeviceKeyEmpty);
+                        cnt = false;
+                    }
+                }
+
+                if (cnt)
+                {
+                    if (!string.IsNullOrWhiteSpace(args.Param.UserName))
+                    {
+                        getUser = _userRepository.GetAll().FirstOrDefault(i => i.UserName == args.Param.UserName);
+                        if (getUser == null)
+                        {
+                            rtn = rtn.SendError(TokenErrorsEnum.CreateToken_UserNotFound);
+                            cnt = false;
+                        }
+                    }
+                    else
+                    {
+                        getUser = _userRepository.GetAll().FirstOrDefault(i => i.Email == args.Param.Email);
+                        if (getUser == null)
+                        {
+                            rtn = rtn.SendError(TokenErrorsEnum.CreateToken_UserNotFound);
+                            cnt = false;
+                        }
+                    }
+                }
+
+                if (cnt)
+                {
+                    getUser.Password = getUser.Password.ToUpper();
+                    args.Param.Password = args.Param.Password.ToUpper();
+
+                    if (getUser.Password != args.Param.Password)
+                    {
+                        cnt = false;
+                        rtn = rtn.SendError(TokenErrorsEnum.CreateToken_WrongPass);
+                    }
+                }
+
+                if (cnt)
+                {
+                    getToken = Repository.GetAll().FirstOrDefault(i => i.UserId == getUser.Id && i.DeviceKey == args.Param.DeviceKey && i.Status == true);
+                    if (getToken != null)
+                    {
                         rtn.Result = getToken.TokenCode;
                     }
                 }
 
-                if (cnt && string.IsNullOrWhiteSpace (rtn.Result)) {
-                    getUserRoles = GetUserRoleList (getUser.Id);
-                    if (getUserRoles.ErrorInfo.Status) {
-                        rtn.ErrorInfo = getUserRoles.ErrorInfo;
+                if (cnt && string.IsNullOrWhiteSpace(rtn.Result))
+                {
+                    getUserRoles = GetUserRoleList(getUser.Id);
+                    if (getUserRoles.Error.Status)
+                    {
+                        rtn.Error = getUserRoles.Error;
                         cnt = false;
                     }
                 }
 
-                if (cnt && string.IsNullOrWhiteSpace (rtn.Result)) {
-                    saveTokenModel = new Token {
+                if (cnt && string.IsNullOrWhiteSpace(rtn.Result))
+                {
+                    saveTokenModel = new Token
+                    {
                         Status = true,
                         AddingDate = DateTime.Now,
                         UpdatingDate = DateTime.Now,
@@ -207,51 +243,56 @@ namespace CSBEF.Module.UserManagement.Services {
                         UpdatingUserId = getUser.Id,
                         UserId = getUser.Id,
                         TokenCode = "[tokenInComing]",
-                        ExpiredDate = DateTime.UtcNow.AddDays (Configuration["AppSettings:JWTSettings:ExpireDays"].ToInt (365)),
+                        ExpiredDate = DateTime.UtcNow.AddDays(_configuration["AppSettings:JWTSettings:ExpireDays"].ToInt(365)),
                         Device = args.Param.Device,
                         DeviceKey = args.Param.DeviceKey
                     };
-                    saveTokenModel = Repository.Add (saveTokenModel);
-                    Repository.Save ();
+                    saveTokenModel = Repository.Add(saveTokenModel);
+                    Repository.Save();
                 }
 
-                if (cnt && string.IsNullOrWhiteSpace (rtn.Result)) {
-                    tokenHandler = new JwtSecurityTokenHandler ();
-                    key = Encoding.ASCII.GetBytes (Configuration["AppSettings:JWTSettings:SecretCode"]);
-                    tokenDescriptor = new SecurityTokenDescriptor {
+                if (cnt && string.IsNullOrWhiteSpace(rtn.Result))
+                {
+                    tokenHandler = new JwtSecurityTokenHandler();
+                    key = Encoding.ASCII.GetBytes(_configuration["AppSettings:JWTSettings:SecretCode"]);
+                    tokenDescriptor = new SecurityTokenDescriptor
+                    {
                         Audience = "CSBEF",
                         Issuer = "JWT.CSBEF",
-                        Subject = new ClaimsIdentity (new Claim[] {
-                        new Claim (ClaimTypes.Name, getUser.Id.ToStringNotNull (string.Empty)),
-                        new Claim (ClaimTypes.Email, getUser.Email),
-                        new Claim (ClaimTypes.GivenName, args.Param.Device),
-                        new Claim (ClaimTypes.SerialNumber, args.Param.DeviceKey),
-                        new Claim ("UserName", getUser.Name),
-                        new Claim ("UserSurname", getUser.Surname),
-                        new Claim ("ProfilePic", getUser.ProfilePic),
-                        new Claim ("ProfileBgPic", getUser.ProfileBgPic),
-                        new Claim ("ProfileStatusMessage", getUser.ProfileStatusMessage),
-                        new Claim ("TokenId", saveTokenModel.Id.ToStringNotNull (string.Empty))
-                        }),
-                        Expires = DateTime.UtcNow.AddDays (Configuration["AppSettings:JWTSettings:ExpireDays"].ToInt (365)),
-                        SigningCredentials = new SigningCredentials (new SymmetricSecurityKey (key), SecurityAlgorithms.HmacSha256Signature)
+                        Subject = new ClaimsIdentity(new Claim[] {
+                        new Claim(ClaimTypes.Name, getUser.Id.ToStringNotNull(string.Empty)),
+                        new Claim(ClaimTypes.Email, getUser.Email),
+                        new Claim(ClaimTypes.GivenName, args.Param.Device),
+                        new Claim(ClaimTypes.SerialNumber, args.Param.DeviceKey),
+                        new Claim("UserName", getUser.Name),
+                        new Claim("UserSurname", getUser.Surname),
+                        new Claim("ProfilePic", getUser.ProfilePic),
+                        new Claim("ProfileBgPic", getUser.ProfileBgPic),
+                        new Claim("ProfileStatusMessage", getUser.ProfileStatusMessage),
+                        new Claim("TokenId", saveTokenModel.Id.ToStringNotNull(string.Empty))
+                    }),
+                        Expires = DateTime.UtcNow.AddDays(_configuration["AppSettings:JWTSettings:ExpireDays"].ToInt(365)),
+                        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
                     };
 
-                    if (getUserRoles.Result.Any ()) {
-                        foreach (var role in getUserRoles.Result) {
-                            tokenDescriptor.Subject.AddClaim (new Claim (ClaimTypes.Role, role.RoleName));
+                    if (getUserRoles.Result.Any())
+                    {
+                        foreach (var role in getUserRoles.Result)
+                        {
+                            tokenDescriptor.Subject.AddClaim(new Claim(ClaimTypes.Role, role.RoleName));
                         }
                     }
 
-                    token = tokenHandler.CreateToken (tokenDescriptor);
-                    tokenString = tokenHandler.WriteToken (token);
+                    token = tokenHandler.CreateToken(tokenDescriptor);
+                    tokenString = tokenHandler.WriteToken(token);
                 }
 
-                if (cnt && string.IsNullOrWhiteSpace (rtn.Result) && !string.IsNullOrWhiteSpace (tokenString)) {
+                if (cnt && string.IsNullOrWhiteSpace(rtn.Result) && !string.IsNullOrWhiteSpace(tokenString))
+                {
                     saveTokenModel.TokenCode = tokenString;
 
-                    Repository.Update (saveTokenModel);
-                    Repository.Save ();
+                    Repository.Update(saveTokenModel);
+                    Repository.Save();
 
                     rtn.Result = tokenString;
                 }
@@ -260,21 +301,27 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region After Event Handler
 
-                if (cnt) {
-                    afterEventParameterModel = new AfterEventParameterModel<IReturnModel<string>, ServiceParamsWithIdentifier<CreateTokenModel>> {
+                if (cnt)
+                {
+                    afterEventParameterModel = new AfterEventParameterModel<IReturnModel<string>, ServiceParamsWithIdentifier<CreateTokenModel>>
+                    {
                         DataToBeSent = rtn,
                         ActionParameter = args,
                         ModuleName = ModuleName,
                         ServiceName = ServiceName,
                         ActionName = "CreateToken"
                     };
-                    afterEventHandler = EventService.GetEvent (ModuleName, $"{ServiceName}.CreateToken.After")
-                        .EventHandler<string, IAfterEventParameterModel<IReturnModel<string>, ServiceParamsWithIdentifier<CreateTokenModel>>> (afterEventParameterModel);
-                    if (afterEventHandler != null) {
-                        if (afterEventHandler.ErrorInfo.Status) {
-                            rtn.ErrorInfo = afterEventHandler.ErrorInfo;
+                    afterEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.CreateToken.After")
+                        .EventHandler<string, IAfterEventParameterModel<IReturnModel<string>, ServiceParamsWithIdentifier<CreateTokenModel>>>(afterEventParameterModel);
+                    if (afterEventHandler != null)
+                    {
+                        if (afterEventHandler.Error.Status)
+                        {
+                            rtn.Error = afterEventHandler.Error;
                             cnt = false;
-                        } else {
+                        }
+                        else
+                        {
                             rtn.Result = afterEventHandler.Result;
                         }
                     }
@@ -299,20 +346,24 @@ namespace CSBEF.Module.UserManagement.Services {
                 saveTokenModel = null;
 
                 #endregion Clear Memory
-            } catch (CustomException ex) {
-                rtn = rtn.SendError (GlobalError.TechnicalError, ex);
+            }
+            catch (Exception ex)
+            {
+                rtn = rtn.SendError(GlobalErrors.TechnicalError, ex);
             }
 
             return rtn;
         }
 
-        public IReturnModel<bool> CheckToken (ServiceParamsWithIdentifier<string> args) {
+        public IReturnModel<bool> CheckToken(ServiceParamsWithIdentifier<string> args)
+        {
             if (args == null)
-                throw new ArgumentNullException (nameof (args));
+                throw new ArgumentNullException(nameof(args));
 
-            IReturnModel<bool> rtn = new ReturnModel<bool> (Logger);
+            IReturnModel<bool> rtn = new ReturnModel<bool>(_logger);
 
-            try {
+            try
+            {
                 #region Variables
 
                 bool cnt = true;
@@ -332,10 +383,12 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region Before Event Handler
 
-                beforeEventHandler = EventService.GetEvent (ModuleName, $"{ServiceName}.CheckToken.Before").EventHandler<bool, ServiceParamsWithIdentifier<string>> (args);
-                if (beforeEventHandler != null) {
-                    if (beforeEventHandler.ErrorInfo.Status) {
-                        rtn.ErrorInfo = beforeEventHandler.ErrorInfo;
+                beforeEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.CheckToken.Before").EventHandler<bool, ServiceParamsWithIdentifier<string>>(args);
+                if (beforeEventHandler != null)
+                {
+                    if (beforeEventHandler.Error.Status)
+                    {
+                        rtn.Error = beforeEventHandler.Error;
                         cnt = false;
                     }
                 }
@@ -344,31 +397,34 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region Action Body
 
-                if (cnt) {
+                if (cnt)
+                {
                     stream = args.Param;
-                    handler = new JwtSecurityTokenHandler ();
-                    jsonToken = handler.ReadToken (stream);
-                    tokenS = handler.ReadToken (stream) as JwtSecurityToken;
+                    handler = new JwtSecurityTokenHandler();
+                    jsonToken = handler.ReadToken(stream);
+                    tokenS = handler.ReadToken(stream) as JwtSecurityToken;
 
-                    userId = tokenS.Claims.FirstOrDefault (i => i.Type == "unique_name");
+                    userId = tokenS.Claims.FirstOrDefault(i => i.Type == "unique_name");
                     if (userId == null)
                         cnt = false;
                 }
 
-                if (cnt) {
-                    deviceKey = tokenS.Claims.FirstOrDefault (i => i.Type == "certserialnumber");
+                if (cnt)
+                {
+                    deviceKey = tokenS.Claims.FirstOrDefault(i => i.Type == "certserialnumber");
                     if (deviceKey == null)
                         cnt = false;
                 }
 
-                if (cnt) {
-                    var userIdCleam = userId.Value.ToInt (0);
-                    getTokens = Repository.GetAll ().Where (i => i.UserId == userIdCleam && i.DeviceKey == deviceKey.Value).ToList ();
-                    cnt = getTokens.Any ();
+                if (cnt)
+                {
+                    getTokens = Repository.GetAll().Where(i => i.UserId == userId.Value.ToInt(0) && i.DeviceKey == deviceKey.Value).ToList();
+                    cnt = getTokens.Any();
                 }
 
-                if (cnt) {
-                    getToken = getTokens.FirstOrDefault (i => i.TokenCode == args.Param);
+                if (cnt)
+                {
+                    getToken = getTokens.FirstOrDefault(i => i.TokenCode == args.Param);
                     if (getToken == null)
                         cnt = false;
                     else if (!getToken.Status)
@@ -383,21 +439,27 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region After Event Handler
 
-                if (cnt) {
-                    afterEventParameterModel = new AfterEventParameterModel<IReturnModel<bool>, ServiceParamsWithIdentifier<string>> {
+                if (cnt)
+                {
+                    afterEventParameterModel = new AfterEventParameterModel<IReturnModel<bool>, ServiceParamsWithIdentifier<string>>
+                    {
                         DataToBeSent = rtn,
                         ActionParameter = args,
                         ModuleName = ModuleName,
                         ServiceName = ServiceName,
                         ActionName = "CheckToken"
                     };
-                    afterEventHandler = EventService.GetEvent (ModuleName, $"{ServiceName}.CreateToken.After")
-                        .EventHandler<bool, IAfterEventParameterModel<IReturnModel<bool>, ServiceParamsWithIdentifier<string>>> (afterEventParameterModel);
-                    if (afterEventHandler != null) {
-                        if (afterEventHandler.ErrorInfo.Status) {
-                            rtn.ErrorInfo = afterEventHandler.ErrorInfo;
+                    afterEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.CreateToken.After")
+                        .EventHandler<bool, IAfterEventParameterModel<IReturnModel<bool>, ServiceParamsWithIdentifier<string>>>(afterEventParameterModel);
+                    if (afterEventHandler != null)
+                    {
+                        if (afterEventHandler.Error.Status)
+                        {
+                            rtn.Error = afterEventHandler.Error;
                             cnt = false;
-                        } else {
+                        }
+                        else
+                        {
                             rtn.Result = afterEventHandler.Result;
                         }
                     }
@@ -421,8 +483,10 @@ namespace CSBEF.Module.UserManagement.Services {
                 getToken = null;
 
                 #endregion Clear Memory
-            } catch (CustomException ex) {
-                rtn = rtn.SendError (GlobalError.TechnicalError, ex);
+            }
+            catch (Exception ex)
+            {
+                rtn = rtn.SendError(GlobalErrors.TechnicalError, ex);
             }
 
             return rtn;
@@ -432,10 +496,12 @@ namespace CSBEF.Module.UserManagement.Services {
 
         #region Private Helpers
 
-        private IReturnModel<IList<RoleDTO>> GetUserRoleList (int userId) {
-            IReturnModel<IList<RoleDTO>> rtn = new ReturnModel<IList<RoleDTO>> (Logger);
+        private IReturnModel<IList<RoleDTO>> GetUserRoleList(int userId)
+        {
+            IReturnModel<IList<RoleDTO>> rtn = new ReturnModel<IList<RoleDTO>>(_logger);
 
-            try {
+            try
+            {
                 #region Variables
 
                 bool cnt = true;
@@ -444,8 +510,8 @@ namespace CSBEF.Module.UserManagement.Services {
                 IReturnModel<IList<RoleDTO>> afterEventHandler = null;
                 IList<UserInGroup> getGroups = null;
                 IList<GroupInRole> getGroupInRoles = null;
-                List<int> roles = new List<int> ();
-                List<int> roles2 = new List<int> ();
+                List<int> roles = new List<int>();
+                List<int> roles2 = new List<int>();
                 IList<UserInRole> getUserInRoles = null;
                 Role getRole = null;
 
@@ -453,10 +519,12 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region Before Event Handler
 
-                beforeEventHandler = EventService.GetEvent (ModuleName, $"{ServiceName}.GetUserRoleList.Before").EventHandler<bool, int> (userId);
-                if (beforeEventHandler != null) {
-                    if (beforeEventHandler.ErrorInfo.Status) {
-                        rtn.ErrorInfo = beforeEventHandler.ErrorInfo;
+                beforeEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.GetUserRoleList.Before").EventHandler<bool, int>(userId);
+                if (beforeEventHandler != null)
+                {
+                    if (beforeEventHandler.Error.Status)
+                    {
+                        rtn.Error = beforeEventHandler.Error;
                         cnt = false;
                     }
                 }
@@ -465,31 +533,38 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region Action Body
 
-                if (cnt) {
-                    rtn.Result = new List<RoleDTO> ();
-                    getGroups = _userInGroupRepository.GetAll ().Where (i => i.UserId == userId).ToList ();
-                    if (getGroups.Any ()) {
-                        foreach (var item in getGroups) {
-                            getGroupInRoles = _groupInRoleRepository.GetAll ().Where (i => i.GroupId == item.GroupId).ToList ();
-                            if (getGroupInRoles.Any ()) {
-                                roles.AddRange (getGroupInRoles.Select (i => i.RoleId));
+                if (cnt)
+                {
+                    rtn.Result = new List<RoleDTO>();
+                    getGroups = _userInGroupRepository.GetAll().Where(i => i.UserId == userId).ToList();
+                    if (getGroups.Any())
+                    {
+                        foreach (var item in getGroups)
+                        {
+                            getGroupInRoles = _groupInRoleRepository.GetAll().Where(i => i.GroupId == item.GroupId).ToList();
+                            if (getGroupInRoles.Any())
+                            {
+                                roles.AddRange(getGroupInRoles.Select(i => i.RoleId));
                             }
                         }
                     }
 
-                    getUserInRoles = _userInRoleRepository.GetAll ().Where (i => i.UserId == userId).ToList ();
-                    if (getUserInRoles.Any ()) {
-                        roles.AddRange (getUserInRoles.Select (i => i.RoleId));
+                    getUserInRoles = _userInRoleRepository.GetAll().Where(i => i.UserId == userId).ToList();
+                    if (getUserInRoles.Any())
+                    {
+                        roles.AddRange(getUserInRoles.Select(i => i.RoleId));
                     }
 
-                    if (roles.Any ()) {
-                        roles2 = roles.Distinct ().ToList ();
-                        foreach (var role in roles2) {
+                    if (roles.Any())
+                    {
+                        roles2 = roles.Distinct().ToList();
+                        foreach (var role in roles2)
+                        {
                             if (!cnt)
                                 continue;
 
-                            getRole = _roleRepository.Find (i => i.Id == role);
-                            rtn.Result.Add (Mapper.Map<RoleDTO> (getRole));
+                            getRole = _roleRepository.Find(i => i.Id == role);
+                            rtn.Result.Add(_mapper.Map<RoleDTO>(getRole));
                         }
                     }
                 }
@@ -498,18 +573,24 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region After Event Handler
 
-                if (cnt) {
-                    afterEventParameterModel = new AfterEventParameterModel<IList<RoleDTO>, int> {
+                if (cnt)
+                {
+                    afterEventParameterModel = new AfterEventParameterModel<IList<RoleDTO>, int>
+                    {
                         DataToBeSent = rtn.Result,
                         ActionParameter = userId
                     };
-                    afterEventHandler = EventService.GetEvent (ModuleName, $"{ServiceName}.GetUserRoleList.After")
-                        .EventHandler<IList<RoleDTO>, IAfterEventParameterModel<IList<RoleDTO>, int>> (afterEventParameterModel);
-                    if (afterEventHandler != null) {
-                        if (afterEventHandler.ErrorInfo.Status) {
-                            rtn.ErrorInfo = afterEventHandler.ErrorInfo;
+                    afterEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.GetUserRoleList.After")
+                        .EventHandler<IList<RoleDTO>, IAfterEventParameterModel<IList<RoleDTO>, int>>(afterEventParameterModel);
+                    if (afterEventHandler != null)
+                    {
+                        if (afterEventHandler.Error.Status)
+                        {
+                            rtn.Error = afterEventHandler.Error;
                             cnt = false;
-                        } else {
+                        }
+                        else
+                        {
                             rtn.Result = afterEventHandler.Result;
                         }
                     }
@@ -530,8 +611,10 @@ namespace CSBEF.Module.UserManagement.Services {
                 getRole = null;
 
                 #endregion Clear Memory
-            } catch (CustomException ex) {
-                rtn = rtn.SendError (GlobalError.TechnicalError, ex);
+            }
+            catch (Exception ex)
+            {
+                rtn = rtn.SendError(GlobalErrors.TechnicalError, ex);
             }
 
             return rtn;

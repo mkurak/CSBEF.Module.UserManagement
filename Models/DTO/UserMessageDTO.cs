@@ -1,9 +1,9 @@
 ﻿using CSBEF.Core.Models;
 using System;
 
-namespace CSBEF.Module.UserManagement.Poco
+namespace CSBEF.Module.UserManagement.Models.DTO
 {
-    public partial class UserMessage : EntityModelBase
+    public class UserMessageDTO : DTOModelBase
     {
         public int FromUserId { get; set; }
         public int ToUserId { get; set; }

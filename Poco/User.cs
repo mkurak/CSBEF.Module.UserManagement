@@ -1,7 +1,9 @@
 ﻿using CSBEF.Core.Models;
 
-namespace CSBEF.Module.UserManagement.Poco {
-    public partial class User : EntityModelBase {
+namespace CSBEF.Module.UserManagement.Poco
+{
+    public partial class User : EntityModelBase
+    {
         public string Name { get; set; }
         public string Surname { get; set; }
         public string ProfilePic { get; set; }

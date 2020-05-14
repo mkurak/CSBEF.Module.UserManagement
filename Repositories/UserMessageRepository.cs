@@ -5,9 +5,9 @@ using CSBEF.Module.UserManagement.Poco;
 
 namespace CSBEF.Module.UserManagement.Repositories
 {
-    public class UserRepository : RepositoryBase<User>, IUserRepository
+    public class UserMessageRepository : RepositoryBase<UserMessage>, IUserMessageRepository
     {
-        public UserRepository(ModularDbContext context) : base(context)
+        public UserMessageRepository(ModularDbContext context) : base(context)
         {
         }
     }

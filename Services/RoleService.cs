@@ -9,31 +9,35 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace CSBEF.Module.UserManagement.Services {
-    public class RoleService : ServiceBase<Role, RoleDTO>, IRoleService {
+namespace CSBEF.Module.UserManagement.Services
+{
+    public class RoleService : ServiceBase<Role, RoleDTO>, IRoleService
+    {
         #region ctor
 
-        public RoleService (
-            IWebHostEnvironment hostingEnvironment,
-            IConfiguration configuration,
-            ILogger<IReturnModel<bool>> logger,
-            IMapper mapper,
-            IRoleRepository repository,
-            IEventService eventService,
-            IHubSyncDataService hubSyncDataService
+        public RoleService(
+           IWebHostEnvironment hostingEnvironment,
+           IConfiguration configuration,
+           ILogger<ILog> logger,
+           IMapper mapper,
+           IRoleRepository repository,
+           IEventService eventService,
+           IHubSyncDataService hubSyncDataService
 
-            // Other Repository Dependencies
-        ) : base (
-            hostingEnvironment,
-            configuration,
-            logger,
-            mapper,
-            repository,
-            eventService,
-            hubSyncDataService,
-            "UserManagement",
-            "RoleService"
-        ) { }
+        // Other Repository Dependencies
+        ) : base(
+           hostingEnvironment,
+           configuration,
+           logger,
+           mapper,
+           repository,
+           eventService,
+           hubSyncDataService,
+           "UserManagement",
+           "RoleService"
+        )
+        {
+        }
 
         #endregion ctor
     }

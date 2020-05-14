@@ -1,7 +1,9 @@
 ﻿using CSBEF.Core.Models;
 
-namespace CSBEF.Module.UserManagement.Models.DTO {
-    public class UserDTO : DTOModelBase {
+namespace CSBEF.Module.UserManagement.Models.DTO
+{
+    public class UserDTO : DTOModelBase
+    {
         public string Name { get; set; }
         public string Surname { get; set; }
         public string ProfilePic { get; set; }

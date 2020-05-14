@@ -7,14 +7,14 @@
     <Authors>Mesut Kurak</Authors>
     <Company>Code Scientific</Company>
     <Description>It is a user management module developed for CSBEF structure.</Description>
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/mkurak/CSBEF.Module.UserManagement</PackageProjectUrl>
     <RepositoryUrl>https://github.com/mkurak/CSBEF.Module.UserManagement</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
     <PackageTags>CSBEF User Management Module (official)</PackageTags>
-    <Version>3.1.1</Version>
+    <Version>3.1.2</Version>
     <PackageReleaseNotes>
-      - Rebased All files and folders for github build
+      - Since the requests from structural changes in versions 3.1.0 and 3.1.1 were abandoned, version 1.2.4 was returned and updates were made.
     </PackageReleaseNotes>
   </PropertyGroup>
 
@@ -25,15 +25,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CSBEF.Core" Version="3.1.1" />
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8">
+    <PackageReference Include="CSBEF.Core" Version="3.1.2" />
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="LICENSE">
+    <None Include="LICENSE.txt">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>

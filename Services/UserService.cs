@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using AutoMapper;
+﻿using AutoMapper;
 using CSBEF.Core.Abstracts;
 using CSBEF.Core.Concretes;
 using CSBEF.Core.Enums;
@@ -23,12 +17,20 @@ using CSBEF.Module.UserManagement.Poco;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
+using System.Linq;
 
-namespace CSBEF.Module.UserManagement.Services {
-    public class UserService : ServiceBase<User, UserDTO>, IUserService {
+namespace CSBEF.Module.UserManagement.Services
+{
+    public class UserService : ServiceBase<User, UserDTO>, IUserService
+    {
         #region Dependencies
 
         private readonly ITokenRepository _tokenRepository;
+        private readonly IUserMessageRepository _userMessageRepository;
         private readonly IUserInGroupRepository _userInGroupRepository;
         private readonly IGroupInRoleRepository _groupInRoleRepository;
         private readonly IUserInRoleRepository _userInRoleRepository;
@@ -37,32 +39,35 @@ namespace CSBEF.Module.UserManagement.Services {
 
         #region ctor
 
-        public UserService (
-            IWebHostEnvironment hostingEnvironment,
-            IConfiguration configuration,
-            ILogger<IReturnModel<bool>> logger,
-            IMapper mapper,
-            IUserRepository repository,
-            IEventService eventService,
+        public UserService(
+           IWebHostEnvironment hostingEnvironment,
+           IConfiguration configuration,
+           ILogger<ILog> logger,
+           IMapper mapper,
+           IUserRepository repository,
+           IEventService eventService,
 
-            // Other Repository Dependencies
-            ITokenRepository tokenRepository,
-            IUserInGroupRepository userInGroupRepository,
-            IGroupInRoleRepository groupInRoleRepository,
-            IUserInRoleRepository userInRoleRepository,
-            IHubSyncDataService hubSyncDataService
-        ) : base (
-            hostingEnvironment,
-            configuration,
-            logger,
-            mapper,
-            repository,
-            eventService,
-            hubSyncDataService,
-            "UserManagement",
-            "UserService"
-        ) {
+           // Other Repository Dependencies
+           ITokenRepository tokenRepository,
+           IUserMessageRepository userMessageRepository,
+           IUserInGroupRepository userInGroupRepository,
+           IGroupInRoleRepository groupInRoleRepository,
+           IUserInRoleRepository userInRoleRepository,
+           IHubSyncDataService hubSyncDataService
+        ) : base(
+           hostingEnvironment,
+           configuration,
+           logger,
+           mapper,
+           repository,
+           eventService,
+           hubSyncDataService,
+           "UserManagement",
+           "UserService"
+        )
+        {
             _tokenRepository = tokenRepository;
+            _userMessageRepository = userMessageRepository;
             _userInGroupRepository = userInGroupRepository;
             _groupInRoleRepository = groupInRoleRepository;
             _userInRoleRepository = userInRoleRepository;
@@ -72,13 +77,15 @@ namespace CSBEF.Module.UserManagement.Services {
 
         #region Public Actions
 
-        public IReturnModel<bool> ChangePassword (ServiceParamsWithIdentifier<ChangePasswordModel> args) {
+        public IReturnModel<bool> ChangePassword(ServiceParamsWithIdentifier<ChangePasswordModel> args)
+        {
             if (args == null)
-                throw new ArgumentNullException (nameof (args));
+                throw new ArgumentNullException(nameof(args));
 
-            IReturnModel<bool> rtn = new ReturnModel<bool> (Logger);
+            IReturnModel<bool> rtn = new ReturnModel<bool>(_logger);
 
-            try {
+            try
+            {
                 #region Variables
 
                 bool cnt = true;
@@ -87,15 +94,18 @@ namespace CSBEF.Module.UserManagement.Services {
                 IReturnModel<bool> afterEventHandler = null;
                 List<ValidationResult> modelValidation = null;
                 User getUser = null;
+                string passwordHashSecureKey = _configuration["HashSecureKeys:Password"];
 
                 #endregion Variables
 
                 #region Before Event Handler
 
-                beforeEventHandler = EventService.GetEvent (ModuleName, $"{ServiceName}.ChangePassword.Before").EventHandler<bool, ServiceParamsWithIdentifier<ChangePasswordModel>> (args);
-                if (beforeEventHandler != null) {
-                    if (beforeEventHandler.ErrorInfo.Status) {
-                        rtn.ErrorInfo = beforeEventHandler.ErrorInfo;
+                beforeEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.ChangePassword.Before").EventHandler<bool, ServiceParamsWithIdentifier<ChangePasswordModel>>(args);
+                if (beforeEventHandler != null)
+                {
+                    if (beforeEventHandler.Error.Status)
+                    {
+                        rtn.Error = beforeEventHandler.Error;
                         cnt = false;
                     }
                 }
@@ -104,38 +114,46 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region Action Body
 
-                if (cnt) {
-                    modelValidation = args.Param.ModelValidation ();
+                if (cnt)
+                {
+                    modelValidation = args.Param.ModelValidation();
 
-                    if (modelValidation.Any ()) {
-                        rtn = rtn.SendError (UserErrorsEnum.ChangePasswordModelValidationFail);
+                    if (modelValidation.Any())
+                    {
+                        rtn = rtn.SendError(UserErrorsEnum.ChangePassword_ModelValidationFail);
                         cnt = false;
                     }
                 }
 
-                if (cnt) {
-                    getUser = Repository.Find (i => i.Id == args.Param.UserId);
-                    if (getUser == null) {
-                        rtn = rtn.SendError (UserErrorsEnum.ChangePasswordUserNotFound);
+                if (cnt)
+                {
+                    getUser = Repository.Find(i => i.Id == args.Param.UserId);
+                    if (getUser == null)
+                    {
+                        rtn = rtn.SendError(UserErrorsEnum.ChangePassword_UserNotFound);
                         cnt = false;
                     }
                 }
 
-                if (cnt) {
-                    if (getUser.Password.ToUpper (Thread.CurrentThread.CurrentCulture) != Tools.ComputeSha256Hash (args.Param.CurrentPass).ToUpper (Thread.CurrentThread.CurrentCulture)) {
-                        rtn = rtn.SendError (UserErrorsEnum.ChangePasswordWrongCurrentPassword);
+                if (cnt)
+                {
+                    if (getUser.Password.ToUpper() != args.Param.CurrentPass.ToUpper())
+                    {
+                        rtn = rtn.SendError(UserErrorsEnum.ChangePassword_WrongCurrentPassword);
                         cnt = false;
                     }
                 }
 
-                if (cnt) {
-                    getUser.Password = Tools.ComputeSha256Hash (args.Param.NewPass).ToUpper (Thread.CurrentThread.CurrentCulture);
-                    Repository.Update (getUser);
-                    Repository.Save ();
+                if (cnt)
+                {
+                    getUser.Password = args.Param.NewPass.ToUpper();
+                    Repository.Update(getUser);
+                    Repository.Save();
                 }
 
-                if (cnt) {
-                    _tokenRepository.KillUserTokens (args.Param.UserId, args.UserId);
+                if (cnt)
+                {
+                    _tokenRepository.KillUserTokens(args.Param.UserId, args.UserId);
                 }
 
                 rtn.Result = cnt;
@@ -144,21 +162,27 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region After Event Handler
 
-                if (cnt) {
-                    afterEventParameterModel = new AfterEventParameterModel<IReturnModel<bool>, ServiceParamsWithIdentifier<ChangePasswordModel>> {
+                if (cnt)
+                {
+                    afterEventParameterModel = new AfterEventParameterModel<IReturnModel<bool>, ServiceParamsWithIdentifier<ChangePasswordModel>>
+                    {
                         DataToBeSent = rtn,
                         ActionParameter = args,
                         ModuleName = ModuleName,
                         ServiceName = ServiceName,
                         ActionName = "ChangePassword"
                     };
-                    afterEventHandler = EventService.GetEvent (ModuleName, $"{ServiceName}.ChangePassword.After")
-                        .EventHandler<bool, IAfterEventParameterModel<IReturnModel<bool>, ServiceParamsWithIdentifier<ChangePasswordModel>>> (afterEventParameterModel);
-                    if (afterEventHandler != null) {
-                        if (afterEventHandler.ErrorInfo.Status) {
-                            rtn.ErrorInfo = afterEventHandler.ErrorInfo;
+                    afterEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.ChangePassword.After")
+                        .EventHandler<bool, IAfterEventParameterModel<IReturnModel<bool>, ServiceParamsWithIdentifier<ChangePasswordModel>>>(afterEventParameterModel);
+                    if (afterEventHandler != null)
+                    {
+                        if (afterEventHandler.Error.Status)
+                        {
+                            rtn.Error = afterEventHandler.Error;
                             cnt = false;
-                        } else {
+                        }
+                        else
+                        {
                             rtn.Result = afterEventHandler.Result;
                         }
                     }
@@ -174,22 +198,27 @@ namespace CSBEF.Module.UserManagement.Services {
                 afterEventHandler = null;
                 modelValidation = null;
                 getUser = null;
+                passwordHashSecureKey = null;
 
                 #endregion Clear Memory
-            } catch (CustomException ex) {
-                rtn = rtn.SendError (GlobalError.TechnicalError, ex);
+            }
+            catch (Exception ex)
+            {
+                rtn = rtn.SendError(GlobalErrors.TechnicalError, ex);
             }
 
             return rtn;
         }
 
-        public IReturnModel<string> ChangePicture (ServiceParamsWithIdentifier<ChangePictureModel> args) {
+        public IReturnModel<string> ChangePicture(ServiceParamsWithIdentifier<ChangePictureModel> args)
+        {
             if (args == null)
-                throw new ArgumentNullException (nameof (args));
+                throw new ArgumentNullException(nameof(args));
 
-            IReturnModel<string> rtn = new ReturnModel<string> (Logger);
+            IReturnModel<string> rtn = new ReturnModel<string>(_logger);
 
-            try {
+            try
+            {
                 #region Variables
 
                 bool cnt = true;
@@ -207,10 +236,12 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region Before Event Handler
 
-                beforeEventHandler = EventService.GetEvent (ModuleName, $"{ServiceName}.ChangePicture.Before").EventHandler<bool, ServiceParamsWithIdentifier<ChangePictureModel>> (args);
-                if (beforeEventHandler != null) {
-                    if (beforeEventHandler.ErrorInfo.Status) {
-                        rtn.ErrorInfo = beforeEventHandler.ErrorInfo;
+                beforeEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.ChangePicture.Before").EventHandler<bool, ServiceParamsWithIdentifier<ChangePictureModel>>(args);
+                if (beforeEventHandler != null)
+                {
+                    if (beforeEventHandler.Error.Status)
+                    {
+                        rtn.Error = beforeEventHandler.Error;
                         cnt = false;
                     }
                 }
@@ -219,56 +250,67 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region Action Body
 
-                if (cnt) {
-                    modelValidation = args.Param.ModelValidation ();
+                if (cnt)
+                {
+                    modelValidation = args.Param.ModelValidation();
 
-                    if (modelValidation.Any ()) {
-                        rtn = rtn.SendError (UserErrorsEnum.ChangePictureModelValidationFail);
+                    if (modelValidation.Any())
+                    {
+                        rtn = rtn.SendError(UserErrorsEnum.ChangePicture_ModelValidationFail);
                         cnt = false;
                     }
                 }
 
-                if (cnt) {
-                    getUser = Repository.Find (i => i.Id == args.Param.Id);
-                    if (getUser == null) {
-                        rtn = rtn.SendError (UserErrorsEnum.ChangePictureUserNotFound);
+                if (cnt)
+                {
+                    getUser = Repository.Find(i => i.Id == args.Param.Id);
+                    if (getUser == null)
+                    {
+                        rtn = rtn.SendError(UserErrorsEnum.ChangePicture_UserNotFound);
                         cnt = false;
                     }
                 }
 
-                if (cnt) {
-                    uploaderRootPath = Path.Combine (GlobalConfiguration.SWwwRootPath, Configuration["AppSettings:FileUploader:UserManagement:ProfilePicRootPath"]);
-                    newFileUpload = new FileUploader (Configuration, Logger, null, 0, 0, uploaderRootPath);
-                    savedFileName = newFileUpload.Upload (args.Param.Picture);
-                    if (savedFileName.ErrorInfo.Status) {
-                        rtn.ErrorInfo = savedFileName.ErrorInfo;
+                if (cnt)
+                {
+                    uploaderRootPath = Path.Combine(GlobalConfiguration.SWwwRootPath, _configuration["AppSettings:FileUploader:UserManagement:ProfilePicRootPath"]);
+                    newFileUpload = new FileUploader(_configuration, _logger, null, 0, 0, uploaderRootPath);
+                    savedFileName = newFileUpload.Upload(args.Param.Picture);
+                    if (savedFileName.Error.Status)
+                    {
+                        rtn.Error = savedFileName.Error;
                         cnt = false;
                     }
                 }
 
-                if (cnt) {
-                    if (!string.IsNullOrWhiteSpace (getUser.ProfilePic)) {
-                        if (getUser.ProfilePic != "default.jpg") {
-                            targetRemoveFile = Path.Combine (uploaderRootPath, getUser.ProfilePic);
-                            File.Delete (targetRemoveFile);
+                if (cnt)
+                {
+                    if (!string.IsNullOrWhiteSpace(getUser.ProfilePic))
+                    {
+                        if (getUser.ProfilePic != "default.jpg")
+                        {
+                            targetRemoveFile = Path.Combine(uploaderRootPath, getUser.ProfilePic);
+                            File.Delete(targetRemoveFile);
                         }
                     }
 
                     getUser.ProfilePic = savedFileName.Result;
-                    Repository.Update (getUser);
-                    Repository.Save ();
+                    Repository.Update(getUser);
+                    Repository.Save();
 
                     rtn.Result = getUser.ProfilePic;
                 }
 
-                if (cnt) {
-                    HubSyncDataService.OnSync (new HubSyncDataModel<UserDetailsModel> {
+                if (cnt)
+                {
+                    _hubSyncDataService.OnSync(new HubSyncDataModel<UserDetailsModel>
+                    {
                         Key = "UserManagement_User",
                         ProcessType = "update",
                         Id = args.Param.Id,
                         UserId = args.UserId,
                         Name = getUser.Name + " " + getUser.Surname,
-                        Data = GetUserDetails (args.Param.Id).Result
+                        Data = (GetUserDetails(args.Param.Id)).Result
                     });
                 }
 
@@ -276,21 +318,27 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region After Event Handler
 
-                if (cnt) {
-                    afterEventParameterModel = new AfterEventParameterModel<IReturnModel<string>, ServiceParamsWithIdentifier<ChangePictureModel>> {
+                if (cnt)
+                {
+                    afterEventParameterModel = new AfterEventParameterModel<IReturnModel<string>, ServiceParamsWithIdentifier<ChangePictureModel>>
+                    {
                         DataToBeSent = rtn,
                         ActionParameter = args,
                         ModuleName = ModuleName,
                         ServiceName = ServiceName,
                         ActionName = "ChangePicture"
                     };
-                    afterEventHandler = EventService.GetEvent (ModuleName, $"{ServiceName}.ChangePicture.After")
-                        .EventHandler<string, IAfterEventParameterModel<IReturnModel<string>, ServiceParamsWithIdentifier<ChangePictureModel>>> (afterEventParameterModel);
-                    if (afterEventHandler != null) {
-                        if (afterEventHandler.ErrorInfo.Status) {
-                            rtn.ErrorInfo = afterEventHandler.ErrorInfo;
+                    afterEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.ChangePicture.After")
+                        .EventHandler<string, IAfterEventParameterModel<IReturnModel<string>, ServiceParamsWithIdentifier<ChangePictureModel>>>(afterEventParameterModel);
+                    if (afterEventHandler != null)
+                    {
+                        if (afterEventHandler.Error.Status)
+                        {
+                            rtn.Error = afterEventHandler.Error;
                             cnt = false;
-                        } else {
+                        }
+                        else
+                        {
                             rtn.Result = afterEventHandler.Result;
                         }
                     }
@@ -312,20 +360,24 @@ namespace CSBEF.Module.UserManagement.Services {
                 targetRemoveFile = null;
 
                 #endregion Clear Memory
-            } catch (CustomException ex) {
-                rtn = rtn.SendError (GlobalError.TechnicalError, ex);
+            }
+            catch (Exception ex)
+            {
+                rtn = rtn.SendError(GlobalErrors.TechnicalError, ex);
             }
 
             return rtn;
         }
 
-        public IReturnModel<string> ChangeBgPicture (ServiceParamsWithIdentifier<ChangePictureModel> args) {
+        public IReturnModel<string> ChangeBgPicture(ServiceParamsWithIdentifier<ChangePictureModel> args)
+        {
             if (args == null)
-                throw new ArgumentNullException (nameof (args));
+                throw new ArgumentNullException(nameof(args));
 
-            IReturnModel<string> rtn = new ReturnModel<string> (Logger);
+            IReturnModel<string> rtn = new ReturnModel<string>(_logger);
 
-            try {
+            try
+            {
                 #region Variables
 
                 bool cnt = true;
@@ -343,10 +395,12 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region Before Event Handler
 
-                beforeEventHandler = EventService.GetEvent (ModuleName, $"{ServiceName}.ChangeBgPicture.Before").EventHandler<bool, ServiceParamsWithIdentifier<ChangePictureModel>> (args);
-                if (beforeEventHandler != null) {
-                    if (beforeEventHandler.ErrorInfo.Status) {
-                        rtn.ErrorInfo = beforeEventHandler.ErrorInfo;
+                beforeEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.ChangeBgPicture.Before").EventHandler<bool, ServiceParamsWithIdentifier<ChangePictureModel>>(args);
+                if (beforeEventHandler != null)
+                {
+                    if (beforeEventHandler.Error.Status)
+                    {
+                        rtn.Error = beforeEventHandler.Error;
                         cnt = false;
                     }
                 }
@@ -355,56 +409,67 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region Action Body
 
-                if (cnt) {
-                    modelValidation = args.Param.ModelValidation ();
+                if (cnt)
+                {
+                    modelValidation = args.Param.ModelValidation();
 
-                    if (modelValidation.Any ()) {
-                        rtn = rtn.SendError (UserErrorsEnum.ChangePictureModelValidationFail);
+                    if (modelValidation.Any())
+                    {
+                        rtn = rtn.SendError(UserErrorsEnum.ChangePicture_ModelValidationFail);
                         cnt = false;
                     }
                 }
 
-                if (cnt) {
-                    getUser = Repository.Find (i => i.Id == args.Param.Id);
-                    if (getUser == null) {
-                        rtn = rtn.SendError (UserErrorsEnum.ChangePictureUserNotFound);
+                if (cnt)
+                {
+                    getUser = Repository.Find(i => i.Id == args.Param.Id);
+                    if (getUser == null)
+                    {
+                        rtn = rtn.SendError(UserErrorsEnum.ChangePicture_UserNotFound);
                         cnt = false;
                     }
                 }
 
-                if (cnt) {
-                    uploaderRootPath = Path.Combine (GlobalConfiguration.SWwwRootPath, Configuration["AppSettings:FileUploader:UserManagement:ProfileBgPicRootPath"]);
-                    newFileUpload = new FileUploader (Configuration, Logger, null, 0, 0, uploaderRootPath);
-                    savedFileName = newFileUpload.Upload (args.Param.Picture);
-                    if (savedFileName.ErrorInfo.Status) {
-                        rtn.ErrorInfo = savedFileName.ErrorInfo;
+                if (cnt)
+                {
+                    uploaderRootPath = Path.Combine(GlobalConfiguration.SWwwRootPath, _configuration["AppSettings:FileUploader:UserManagement:ProfileBgPicRootPath"]);
+                    newFileUpload = new FileUploader(_configuration, _logger, null, 0, 0, uploaderRootPath);
+                    savedFileName = newFileUpload.Upload(args.Param.Picture);
+                    if (savedFileName.Error.Status)
+                    {
+                        rtn.Error = savedFileName.Error;
                         cnt = false;
                     }
                 }
 
-                if (cnt) {
-                    if (!string.IsNullOrWhiteSpace (getUser.ProfileBgPic)) {
-                        if (getUser.ProfileBgPic != "default.jpg") {
-                            targetRemoveFile = Path.Combine (uploaderRootPath, getUser.ProfilePic);
-                            File.Delete (targetRemoveFile);
+                if (cnt)
+                {
+                    if (!string.IsNullOrWhiteSpace(getUser.ProfileBgPic))
+                    {
+                        if (getUser.ProfileBgPic != "default.jpg")
+                        {
+                            targetRemoveFile = Path.Combine(uploaderRootPath, getUser.ProfilePic);
+                            File.Delete(targetRemoveFile);
                         }
                     }
 
                     getUser.ProfileBgPic = savedFileName.Result;
-                    Repository.Update (getUser);
-                    Repository.Save ();
+                    Repository.Update(getUser);
+                    Repository.Save();
 
                     rtn.Result = getUser.ProfilePic;
                 }
 
-                if (cnt) {
-                    HubSyncDataService.OnSync (new HubSyncDataModel<UserDetailsModel> {
+                if (cnt)
+                {
+                    _hubSyncDataService.OnSync(new HubSyncDataModel<UserDetailsModel>
+                    {
                         Key = "UserManagement_User",
                         ProcessType = "update",
                         Id = args.Param.Id,
                         UserId = args.UserId,
                         Name = getUser.Name + " " + getUser.Surname,
-                        Data = (GetUserDetails (args.Param.Id)).Result
+                        Data = (GetUserDetails(args.Param.Id)).Result
                     });
                 }
 
@@ -412,21 +477,27 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region After Event Handler
 
-                if (cnt) {
-                    afterEventParameterModel = new AfterEventParameterModel<IReturnModel<string>, ServiceParamsWithIdentifier<ChangePictureModel>> {
+                if (cnt)
+                {
+                    afterEventParameterModel = new AfterEventParameterModel<IReturnModel<string>, ServiceParamsWithIdentifier<ChangePictureModel>>
+                    {
                         DataToBeSent = rtn,
                         ActionParameter = args,
                         ModuleName = ModuleName,
                         ServiceName = ServiceName,
                         ActionName = "ChangeBgPicture"
                     };
-                    afterEventHandler = EventService.GetEvent (ModuleName, $"{ServiceName}.ChangeBgPicture.After")
-                        .EventHandler<string, IAfterEventParameterModel<IReturnModel<string>, ServiceParamsWithIdentifier<ChangePictureModel>>> (afterEventParameterModel);
-                    if (afterEventHandler != null) {
-                        if (afterEventHandler.ErrorInfo.Status) {
-                            rtn.ErrorInfo = afterEventHandler.ErrorInfo;
+                    afterEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.ChangeBgPicture.After")
+                        .EventHandler<string, IAfterEventParameterModel<IReturnModel<string>, ServiceParamsWithIdentifier<ChangePictureModel>>>(afterEventParameterModel);
+                    if (afterEventHandler != null)
+                    {
+                        if (afterEventHandler.Error.Status)
+                        {
+                            rtn.Error = afterEventHandler.Error;
                             cnt = false;
-                        } else {
+                        }
+                        else
+                        {
                             rtn.Result = afterEventHandler.Result;
                         }
                     }
@@ -448,20 +519,168 @@ namespace CSBEF.Module.UserManagement.Services {
                 targetRemoveFile = null;
 
                 #endregion Clear Memory
-            } catch (CustomException ex) {
-                rtn = rtn.SendError (GlobalError.TechnicalError, ex);
+            }
+            catch (Exception ex)
+            {
+                rtn = rtn.SendError(GlobalErrors.TechnicalError, ex);
             }
 
             return rtn;
         }
 
-        public IReturnModel<bool> ChangeProfileInformations (ServiceParamsWithIdentifier<ChangeProfileInformationsModel> args) {
+        public IReturnModel<IList<UserForCurrentUser>> UserListForCurrentUser(ServiceParamsWithIdentifier<int> args)
+        {
             if (args == null)
-                throw new ArgumentNullException (nameof (args));
+                throw new ArgumentNullException(nameof(args));
 
-            IReturnModel<bool> rtn = new ReturnModel<bool> (Logger);
+            IReturnModel<IList<UserForCurrentUser>> rtn = new ReturnModel<IList<UserForCurrentUser>>(_logger);
 
-            try {
+            try
+            {
+                #region Variables
+
+                bool cnt = true;
+                IReturnModel<bool> beforeEventHandler = null;
+                AfterEventParameterModel<IReturnModel<IList<UserForCurrentUser>>, ServiceParamsWithIdentifier<int>> afterEventParameterModel = null;
+                IReturnModel<IList<UserForCurrentUser>> afterEventHandler = null;
+                User getUser = null;
+                ICollection<User> users = null;
+                IList<UserForCurrentUser> convertList = null;
+                ICollection<UserMessage> messages = null;
+
+                #endregion Variables
+
+                #region Before Event Handler
+
+                beforeEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.UserListForCurrentUser.Before").EventHandler<bool, ServiceParamsWithIdentifier<int>>(args);
+                if (beforeEventHandler != null)
+                {
+                    if (beforeEventHandler.Error.Status)
+                    {
+                        rtn.Error = beforeEventHandler.Error;
+                        cnt = false;
+                    }
+                }
+
+                #endregion Before Event Handler
+
+                #region Action Body
+
+                if (cnt)
+                {
+                    getUser = Repository.Find(i => i.Id == args.Param);
+                    if (getUser == null)
+                    {
+                        rtn = rtn.SendError(UserErrorsEnum.UserListForCurrentUser_UserNotFound);
+                        cnt = false;
+                    }
+                }
+
+                if (cnt)
+                {
+                    users = Repository.FindAll(i => i.Status == true);
+                    cnt = users.Any();
+                }
+
+                if (cnt)
+                {
+                    convertList = _mapper.Map<List<UserForCurrentUser>>(users);
+
+                    foreach (var user in convertList)
+                    {
+                        messages = _userMessageRepository.FindAll(i => (i.FromUserId == user.Id && i.ToUserId == getUser.Id) || (i.ToUserId == user.Id && i.FromUserId == getUser.Id));
+                        if (messages.Any())
+                        {
+                            var lastMessage = messages.Where(i => i.FromUserId == user.Id).OrderByDescending(i => i.AddingDate).FirstOrDefault();
+                            if (lastMessage != null)
+                                user.LastMessage = lastMessage.AddingDate;
+
+                            foreach (var message in messages)
+                            {
+                                var viewStatus = true;
+
+                                if (message.FromUserId != getUser.Id)
+                                {
+                                    viewStatus = message.ViewStatus;
+                                }
+
+                                user.Messages.Add(new MessageModelForCurrentUser
+                                {
+                                    Id = message.Id,
+                                    OwnerMe = message.FromUserId == getUser.Id,
+                                    Message = message.Message,
+                                    ViewStatus = viewStatus,
+                                    SendDate = message.AddingDate,
+                                    ViewDate = message.ViewDate
+                                });
+                            }
+                        }
+                    }
+
+                    rtn.Result = convertList;
+                }
+
+                #endregion Action Body
+
+                #region After Event Handler
+
+                if (cnt)
+                {
+                    afterEventParameterModel = new AfterEventParameterModel<IReturnModel<IList<UserForCurrentUser>>, ServiceParamsWithIdentifier<int>>
+                    {
+                        DataToBeSent = rtn,
+                        ActionParameter = args,
+                        ModuleName = ModuleName,
+                        ServiceName = ServiceName,
+                        ActionName = "UserListForCurrentUser"
+                    };
+                    afterEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.UserListForCurrentUser.After")
+                        .EventHandler<IList<UserForCurrentUser>, IAfterEventParameterModel<IReturnModel<IList<UserForCurrentUser>>, ServiceParamsWithIdentifier<int>>>(afterEventParameterModel);
+                    if (afterEventHandler != null)
+                    {
+                        if (afterEventHandler.Error.Status)
+                        {
+                            rtn.Error = afterEventHandler.Error;
+                            cnt = false;
+                        }
+                        else
+                        {
+                            rtn.Result = afterEventHandler.Result;
+                        }
+                    }
+                }
+
+                #endregion After Event Handler
+
+                #region Clear Memory
+
+                args = null;
+                beforeEventHandler = null;
+                afterEventParameterModel = null;
+                afterEventHandler = null;
+                getUser = null;
+                users = null;
+                convertList = null;
+
+                #endregion Clear Memory
+            }
+            catch (Exception ex)
+            {
+                rtn = rtn.SendError(GlobalErrors.TechnicalError, ex);
+            }
+
+            return rtn;
+        }
+
+        public IReturnModel<bool> ChangeProfileInformations(ServiceParamsWithIdentifier<ChangeProfileInformationsModel> args)
+        {
+            if (args == null)
+                throw new ArgumentNullException(nameof(args));
+
+            IReturnModel<bool> rtn = new ReturnModel<bool>(_logger);
+
+            try
+            {
                 #region Variables
 
                 bool cnt = true;
@@ -475,10 +694,12 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region Before Event Handler
 
-                beforeEventHandler = EventService.GetEvent (ModuleName, $"{ServiceName}.ChangeProfileInformations.Before").EventHandler<bool, ServiceParamsWithIdentifier<ChangeProfileInformationsModel>> (args);
-                if (beforeEventHandler != null) {
-                    if (beforeEventHandler.ErrorInfo.Status) {
-                        rtn.ErrorInfo = beforeEventHandler.ErrorInfo;
+                beforeEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.ChangeProfileInformations.Before").EventHandler<bool, ServiceParamsWithIdentifier<ChangeProfileInformationsModel>>(args);
+                if (beforeEventHandler != null)
+                {
+                    if (beforeEventHandler.Error.Status)
+                    {
+                        rtn.Error = beforeEventHandler.Error;
                         cnt = false;
                     }
                 }
@@ -487,31 +708,37 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region Action Body
 
-                if (cnt) {
-                    modelValidation = args.Param.ModelValidation ();
 
-                    if (modelValidation.Any ()) {
-                        rtn = rtn.SendError (UserErrorsEnum.ChangeProfileInformationsModelValidationFail);
+                if (cnt)
+                {
+                    modelValidation = args.Param.ModelValidation();
+
+                    if (modelValidation.Any())
+                    {
+                        rtn = rtn.SendError(UserErrorsEnum.ChangeProfileInformations_ModelValidationFail);
                         cnt = false;
                     }
                 }
 
-                if (cnt) {
-                    getData = Repository.Find (i => i.Id == args.Param.Id);
-                    if (getData == null) {
-                        rtn = rtn.SendError (UserErrorsEnum.ChangeProfileInformationsDataFound);
+                if (cnt)
+                {
+                    getData = Repository.Find(i => i.Id == args.Param.Id);
+                    if (getData == null)
+                    {
+                        rtn = rtn.SendError(UserErrorsEnum.ChangeProfileInformations_DataFound);
                         cnt = false;
                     }
                 }
 
-                if (cnt) {
+                if (cnt)
+                {
                     getData.Name = args.Param.Name;
                     getData.Surname = args.Param.Surname;
                     getData.ProfileStatusMessage = args.Param.ProfileStatusMessage;
                     getData.UpdatingDate = DateTime.Now;
                     getData.UpdatingUserId = args.UserId;
-                    Repository.Update (getData);
-                    Repository.Save ();
+                    Repository.Update(getData);
+                    Repository.Save();
                 }
 
                 rtn.Result = cnt;
@@ -520,21 +747,27 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region After Event Handler
 
-                if (cnt) {
-                    afterEventParameterModel = new AfterEventParameterModel<IReturnModel<bool>, ServiceParamsWithIdentifier<ChangeProfileInformationsModel>> {
+                if (cnt)
+                {
+                    afterEventParameterModel = new AfterEventParameterModel<IReturnModel<bool>, ServiceParamsWithIdentifier<ChangeProfileInformationsModel>>
+                    {
                         DataToBeSent = rtn,
                         ActionParameter = args,
                         ModuleName = ModuleName,
                         ServiceName = ServiceName,
                         ActionName = "Add"
                     };
-                    afterEventHandler = EventService.GetEvent (ModuleName, $"{ServiceName}.ChangeProfileInformations.After")
-                        .EventHandler<bool, IAfterEventParameterModel<IReturnModel<bool>, ServiceParamsWithIdentifier<ChangeProfileInformationsModel>>> (afterEventParameterModel);
-                    if (afterEventHandler != null) {
-                        if (afterEventHandler.ErrorInfo.Status) {
-                            rtn.ErrorInfo = afterEventHandler.ErrorInfo;
+                    afterEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.ChangeProfileInformations.After")
+                        .EventHandler<bool, IAfterEventParameterModel<IReturnModel<bool>, ServiceParamsWithIdentifier<ChangeProfileInformationsModel>>>(afterEventParameterModel);
+                    if (afterEventHandler != null)
+                    {
+                        if (afterEventHandler.Error.Status)
+                        {
+                            rtn.Error = afterEventHandler.Error;
                             cnt = false;
-                        } else {
+                        }
+                        else
+                        {
                             rtn.Result = afterEventHandler.Result;
                         }
                     }
@@ -552,20 +785,24 @@ namespace CSBEF.Module.UserManagement.Services {
                 getData = null;
 
                 #endregion Clear Memory
-            } catch (CustomException ex) {
-                rtn = rtn.SendError (GlobalError.TechnicalError, ex);
+            }
+            catch (Exception ex)
+            {
+                rtn = rtn.SendError(GlobalErrors.TechnicalError, ex);
             }
 
             return rtn;
         }
 
-        public IReturnModel<IList<UserDetailsModel>> ListWithDetails (ServiceParamsWithIdentifier<ActionFilterModel> args) {
+        public IReturnModel<IList<UserDetailsModel>> ListWithDetails(ServiceParamsWithIdentifier<ActionFilterModel> args)
+        {
             if (args == null)
-                throw new ArgumentNullException (nameof (args));
+                throw new ArgumentNullException(nameof(args));
 
-            IReturnModel<IList<UserDetailsModel>> rtn = new ReturnModel<IList<UserDetailsModel>> (Logger);
+            IReturnModel<IList<UserDetailsModel>> rtn = new ReturnModel<IList<UserDetailsModel>>(_logger);
 
-            try {
+            try
+            {
                 #region Variables
 
                 bool cnt = true;
@@ -579,10 +816,12 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region Before Event Handler
 
-                beforeEventHandler = EventService.GetEvent (ModuleName, $"{ServiceName}.ListWithDetails.Before").EventHandler<bool, ServiceParamsWithIdentifier<ActionFilterModel>> (args);
-                if (beforeEventHandler != null) {
-                    if (beforeEventHandler.ErrorInfo.Status) {
-                        rtn.ErrorInfo = beforeEventHandler.ErrorInfo;
+                beforeEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.ListWithDetails.Before").EventHandler<bool, ServiceParamsWithIdentifier<ActionFilterModel>>(args);
+                if (beforeEventHandler != null)
+                {
+                    if (beforeEventHandler.Error.Status)
+                    {
+                        rtn.Error = beforeEventHandler.Error;
                         cnt = false;
                     }
                 }
@@ -591,23 +830,29 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region Action Body
 
-                if (cnt) {
-                    rtn.Result = new List<UserDetailsModel> ();
+                if (cnt)
+                {
+                    rtn.Result = new List<UserDetailsModel>();
 
-                    baseList = base.List (args.Param);
-                    if (!baseList.Result.Any ())
+                    baseList = base.List(args.Param);
+                    if (!baseList.Result.Any())
                         cnt = false;
                 }
 
-                if (cnt) {
-                    foreach (var user in baseList.Result) {
-                        getUserDetails = GetUserDetails (user.Id);
-                        if (getUserDetails.ErrorInfo.Status) {
-                            rtn.ErrorInfo = getUserDetails.ErrorInfo;
+                if (cnt)
+                {
+                    foreach (var user in baseList.Result)
+                    {
+                        getUserDetails = GetUserDetails(user.Id);
+                        if (getUserDetails.Error.Status)
+                        {
+                            rtn.Error = getUserDetails.Error;
                             cnt = false;
-                        } else {
+                        }
+                        else
+                        {
                             if (getUserDetails.Result != null)
-                                rtn.Result.Add (getUserDetails.Result);
+                                rtn.Result.Add(getUserDetails.Result);
                         }
                     }
                 }
@@ -616,21 +861,27 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region After Event Handler
 
-                if (cnt) {
-                    afterEventParameterModel = new AfterEventParameterModel<IReturnModel<IList<UserDetailsModel>>, ServiceParamsWithIdentifier<ActionFilterModel>> {
+                if (cnt)
+                {
+                    afterEventParameterModel = new AfterEventParameterModel<IReturnModel<IList<UserDetailsModel>>, ServiceParamsWithIdentifier<ActionFilterModel>>
+                    {
                         DataToBeSent = rtn,
                         ActionParameter = args,
                         ModuleName = ModuleName,
                         ServiceName = ServiceName,
                         ActionName = "ListWithDetails"
                     };
-                    afterEventHandler = EventService.GetEvent (ModuleName, $"{ServiceName}.ListWithDetails.After")
-                        .EventHandler<IList<UserDetailsModel>, IAfterEventParameterModel<IReturnModel<IList<UserDetailsModel>>, ServiceParamsWithIdentifier<ActionFilterModel>>> (afterEventParameterModel);
-                    if (afterEventHandler != null) {
-                        if (afterEventHandler.ErrorInfo.Status) {
-                            rtn.ErrorInfo = afterEventHandler.ErrorInfo;
+                    afterEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.ListWithDetails.After")
+                        .EventHandler<IList<UserDetailsModel>, IAfterEventParameterModel<IReturnModel<IList<UserDetailsModel>>, ServiceParamsWithIdentifier<ActionFilterModel>>>(afterEventParameterModel);
+                    if (afterEventHandler != null)
+                    {
+                        if (afterEventHandler.Error.Status)
+                        {
+                            rtn.Error = afterEventHandler.Error;
                             cnt = false;
-                        } else {
+                        }
+                        else
+                        {
                             rtn.Result = afterEventHandler.Result;
                         }
                     }
@@ -648,20 +899,24 @@ namespace CSBEF.Module.UserManagement.Services {
                 getUserDetails = null;
 
                 #endregion Clear Memory
-            } catch (CustomException ex) {
-                rtn = rtn.SendError (GlobalError.TechnicalError, ex);
+            }
+            catch (Exception ex)
+            {
+                rtn = rtn.SendError(GlobalErrors.TechnicalError, ex);
             }
 
             return rtn;
         }
 
-        public IReturnModel<UserDTO> Save (ServiceParamsWithIdentifier<SaveUserModel> args) {
+        public IReturnModel<UserDTO> Save(ServiceParamsWithIdentifier<SaveUserModel> args)
+        {
             if (args == null)
-                throw new ArgumentNullException (nameof (args));
+                throw new ArgumentNullException(nameof(args));
 
-            IReturnModel<UserDTO> rtn = new ReturnModel<UserDTO> (Logger);
+            IReturnModel<UserDTO> rtn = new ReturnModel<UserDTO>(_logger);
 
-            try {
+            try
+            {
                 #region Variables
 
                 bool cnt = true;
@@ -680,10 +935,12 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region Before Event Handler
 
-                beforeEventHandler = EventService.GetEvent (ModuleName, $"{ServiceName}.Save.Before").EventHandler<bool, ServiceParamsWithIdentifier<SaveUserModel>> (args);
-                if (beforeEventHandler != null) {
-                    if (beforeEventHandler.ErrorInfo.Status) {
-                        rtn.ErrorInfo = beforeEventHandler.ErrorInfo;
+                beforeEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.Save.Before").EventHandler<bool, ServiceParamsWithIdentifier<SaveUserModel>>(args);
+                if (beforeEventHandler != null)
+                {
+                    if (beforeEventHandler.Error.Status)
+                    {
+                        rtn.Error = beforeEventHandler.Error;
                         cnt = false;
                     }
                 }
@@ -692,48 +949,57 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region Action Body
 
-                if (cnt) {
-                    modelValidation = args.Param.ModelValidation ();
+                if (cnt)
+                {
+                    modelValidation = args.Param.ModelValidation();
 
-                    if (modelValidation.Any ()) {
-                        rtn = rtn.SendError (UserErrorsEnum.SaveModelValidationFail);
+                    if (modelValidation.Any())
+                    {
+                        rtn = rtn.SendError(UserErrorsEnum.Save_ModelValidationFail);
                         cnt = false;
                     }
                 }
 
-                if (cnt) {
+                if (cnt)
+                {
                     if (args.Param.Id > 0)
-                        checkEmail = Repository.Find (i => i.Email == args.Param.Email && i.Id != args.Param.Id);
+                        checkEmail = Repository.Find(i => i.Email == args.Param.Email && i.Id != args.Param.Id);
                     else
-                        checkEmail = Repository.Find (i => i.Email == args.Param.Email);
+                        checkEmail = Repository.Find(i => i.Email == args.Param.Email);
 
-                    if (checkEmail != null) {
-                        rtn = rtn.SendError (UserErrorsEnum.SaveEmailExists);
+                    if (checkEmail != null)
+                    {
+                        rtn = rtn.SendError(UserErrorsEnum.Save_EmailExists);
                         cnt = false;
                     }
                 }
 
-                if (cnt) {
+                if (cnt)
+                {
                     if (args.Param.Id > 0)
-                        checkUserName = Repository.Find (i => i.UserName == args.Param.UserName && i.Id != args.Param.Id);
+                        checkUserName = Repository.Find(i => i.UserName == args.Param.UserName && i.Id != args.Param.Id);
                     else
-                        checkUserName = Repository.Find (i => i.UserName == args.Param.UserName);
+                        checkUserName = Repository.Find(i => i.UserName == args.Param.UserName);
 
-                    if (checkUserName != null) {
-                        rtn = rtn.SendError (UserErrorsEnum.SaveUserNameExists);
+                    if (checkUserName != null)
+                    {
+                        rtn = rtn.SendError(UserErrorsEnum.Save_UserNameExists);
                         cnt = false;
                     }
                 }
 
-                if (cnt && args.Param.Id > 0) {
-                    getData = Repository.Find (i => i.Id == args.Param.Id);
-                    if (getData == null) {
-                        rtn = rtn.SendError (UserErrorsEnum.SaveUserNotFound);
+                if (cnt && args.Param.Id > 0)
+                {
+                    getData = Repository.Find(i => i.Id == args.Param.Id);
+                    if (getData == null)
+                    {
+                        rtn = rtn.SendError(UserErrorsEnum.Save_UserNotFound);
                         cnt = false;
                     }
                 }
 
-                if (cnt && args.Param.Id > 0) {
+                if (cnt && args.Param.Id > 0)
+                {
                     getData.Name = args.Param.Name;
                     getData.Surname = args.Param.Surname;
                     getData.UserName = args.Param.UserName;
@@ -742,67 +1008,79 @@ namespace CSBEF.Module.UserManagement.Services {
                     getData.UpdatingUserId = args.UserId;
                 }
 
-                if (cnt && args.Param.Id > 0 && !string.IsNullOrWhiteSpace (args.Param.CurrentPassword)) {
-                    if (getData.Password.ToUpper (Thread.CurrentThread.CurrentCulture) != Tools.ComputeSha256Hash (args.Param.CurrentPassword).ToUpper (Thread.CurrentThread.CurrentCulture)) {
-                        rtn = rtn.SendError (UserErrorsEnum.SaveCurrentPasswordWrong);
+                if (cnt && args.Param.Id > 0 && !string.IsNullOrWhiteSpace(args.Param.CurrentPassword))
+                {
+                    if (getData.Password.ToUpper() != args.Param.CurrentPassword.ToUpper())
+                    {
+                        rtn = rtn.SendError(UserErrorsEnum.Save_CurrentPasswordWrong);
                         cnt = false;
-                    } else {
-                        getData.Password = Tools.ComputeSha256Hash (args.Param.NewPassword).ToUpper (Thread.CurrentThread.CurrentCulture);
+                    }
+                    else
+                    {
+                        getData.Password = args.Param.NewPassword;
                     }
                 }
 
-                if (cnt && args.Param.Id == 0 && string.IsNullOrWhiteSpace (args.Param.NewPassword)) {
-                    rtn = rtn.SendError (UserErrorsEnum.SavePasswordRequired);
+                if (cnt && args.Param.Id == 0 && string.IsNullOrWhiteSpace(args.Param.NewPassword))
+                {
+                    rtn = rtn.SendError(UserErrorsEnum.Save_PasswordRequired);
                     cnt = false;
                 }
 
-                if (cnt && args.Param.Id == 0) {
-                    saveData = new User {
-                    Name = args.Param.Name,
-                    Surname = args.Param.Surname,
-                    UserName = args.Param.UserName,
-                    Email = args.Param.Email,
-                    Password = Tools.ComputeSha256Hash (args.Param.NewPassword).ToUpper (Thread.CurrentThread.CurrentCulture),
-                    ProfilePic = "default.jpg",
-                    ProfileBgPic = "default.jpg",
-                    ProfileStatusMessage = "Hello Worl!",
-                    AddingDate = DateTime.Now,
-                    UpdatingDate = DateTime.Now,
-                    AddingUserId = args.UserId,
-                    UpdatingUserId = args.UserId
+                if (cnt && args.Param.Id == 0)
+                {
+                    saveData = new User
+                    {
+                        Name = args.Param.Name,
+                        Surname = args.Param.Surname,
+                        UserName = args.Param.UserName,
+                        Email = args.Param.Email,
+                        Password = args.Param.NewPassword,
+                        ProfilePic = "default.jpg",
+                        ProfileBgPic = "default.jpg",
+                        ProfileStatusMessage = "Hello Worl!",
+                        AddingDate = DateTime.Now,
+                        UpdatingDate = DateTime.Now,
+                        AddingUserId = args.UserId,
+                        UpdatingUserId = args.UserId
                     };
 
-                    savedData = Repository.Add (saveData);
-                    Repository.Save ();
-                    rtn.Result = Mapper.Map<UserDTO> (savedData);
+                    savedData = Repository.Add(saveData);
+                    Repository.Save();
+                    rtn.Result = _mapper.Map<UserDTO>(savedData);
                 }
 
-                if (cnt && args.Param.Id > 0) {
-                    savedData = Repository.Update (getData);
-                    Repository.Save ();
-                    rtn.Result = Mapper.Map<UserDTO> (savedData);
+                if (cnt && args.Param.Id > 0)
+                {
+                    savedData = Repository.Update(getData);
+                    Repository.Save();
+                    rtn.Result = _mapper.Map<UserDTO>(savedData);
 
-                    getTokens = _tokenRepository.FindAll (i => i.UserId == args.Param.Id);
-                    if (getTokens.Any ()) {
-                        foreach (var token in getTokens) {
+                    getTokens = _tokenRepository.FindAll(i => i.UserId == args.Param.Id);
+                    if (getTokens.Any())
+                    {
+                        foreach (var token in getTokens)
+                        {
                             token.Status = false;
                             token.UpdatingDate = DateTime.Now;
                             token.UpdatingUserId = args.UserId;
-                            _tokenRepository.Update (token);
+                            _tokenRepository.Update(token);
                         }
 
-                        Repository.Save ();
+                        Repository.Save();
                     }
                 }
 
-                if (cnt) {
-                    HubSyncDataService.OnSync (new HubSyncDataModel<UserDetailsModel> {
+                if (cnt)
+                {
+                    _hubSyncDataService.OnSync(new HubSyncDataModel<UserDetailsModel>
+                    {
                         Key = "UserManagement_User",
                         ProcessType = args.Param.Id > 0 ? "update" : "add",
-                        Id = args.Param.Id.ToInt (0),
+                        Id = args.Param.Id.ToInt(0),
                         UserId = args.UserId,
                         Name = savedData.Name + " " + savedData.Surname,
-                        Data = GetUserDetails (savedData.Id).Result
+                        Data = (GetUserDetails(savedData.Id)).Result
                     });
                 }
 
@@ -810,21 +1088,27 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region After Event Handler
 
-                if (cnt) {
-                    afterEventParameterModel = new AfterEventParameterModel<IReturnModel<UserDTO>, ServiceParamsWithIdentifier<SaveUserModel>> {
+                if (cnt)
+                {
+                    afterEventParameterModel = new AfterEventParameterModel<IReturnModel<UserDTO>, ServiceParamsWithIdentifier<SaveUserModel>>
+                    {
                         DataToBeSent = rtn,
                         ActionParameter = args,
                         ModuleName = ModuleName,
                         ServiceName = ServiceName,
                         ActionName = "Save"
                     };
-                    afterEventHandler = EventService.GetEvent (ModuleName, $"{ServiceName}.Save.After")
-                        .EventHandler<UserDTO, IAfterEventParameterModel<IReturnModel<UserDTO>, ServiceParamsWithIdentifier<SaveUserModel>>> (afterEventParameterModel);
-                    if (afterEventHandler != null) {
-                        if (afterEventHandler.ErrorInfo.Status) {
-                            rtn.ErrorInfo = afterEventHandler.ErrorInfo;
+                    afterEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.Save.After")
+                        .EventHandler<UserDTO, IAfterEventParameterModel<IReturnModel<UserDTO>, ServiceParamsWithIdentifier<SaveUserModel>>>(afterEventParameterModel);
+                    if (afterEventHandler != null)
+                    {
+                        if (afterEventHandler.Error.Status)
+                        {
+                            rtn.Error = afterEventHandler.Error;
                             cnt = false;
-                        } else {
+                        }
+                        else
+                        {
                             rtn.Result = afterEventHandler.Result;
                         }
                     }
@@ -847,20 +1131,24 @@ namespace CSBEF.Module.UserManagement.Services {
                 getTokens = null;
 
                 #endregion Clear Memory
-            } catch (CustomException ex) {
-                rtn = rtn.SendError (GlobalError.TechnicalError, ex);
+            }
+            catch (Exception ex)
+            {
+                rtn = rtn.SendError(GlobalErrors.TechnicalError, ex);
             }
 
             return rtn;
         }
 
-        public IReturnModel<bool> ChangeStatus (ServiceParamsWithIdentifier<ChangeStatusModel> args) {
+        public IReturnModel<bool> ChangeStatus(ServiceParamsWithIdentifier<ChangeStatusModel> args)
+        {
             if (args == null)
-                throw new ArgumentNullException (nameof (args));
+                throw new ArgumentNullException(nameof(args));
 
-            IReturnModel<bool> rtn = new ReturnModel<bool> (Logger);
+            IReturnModel<bool> rtn = new ReturnModel<bool>(_logger);
 
-            try {
+            try
+            {
                 #region Variables
 
                 bool cnt = true;
@@ -875,10 +1163,12 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region Before Event Handler
 
-                beforeEventHandler = EventService.GetEvent (ModuleName, $"{ServiceName}.ChangeStatus.Before").EventHandler<bool, ServiceParamsWithIdentifier<ChangeStatusModel>> (args);
-                if (beforeEventHandler != null) {
-                    if (beforeEventHandler.ErrorInfo.Status) {
-                        rtn.ErrorInfo = beforeEventHandler.ErrorInfo;
+                beforeEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.ChangeStatus.Before").EventHandler<bool, ServiceParamsWithIdentifier<ChangeStatusModel>>(args);
+                if (beforeEventHandler != null)
+                {
+                    if (beforeEventHandler.Error.Status)
+                    {
+                        rtn.Error = beforeEventHandler.Error;
                         cnt = false;
                     }
                 }
@@ -887,46 +1177,56 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region Action Body
 
-                if (cnt) {
-                    modelValidation = args.Param.ModelValidation ();
+                if (cnt)
+                {
+                    modelValidation = args.Param.ModelValidation();
 
-                    if (modelValidation.Any ()) {
-                        rtn = rtn.SendError (UserErrorsEnum.ChangeStatusModelValidationFail);
+                    if (modelValidation.Any())
+                    {
+                        rtn = rtn.SendError(UserErrorsEnum.ChangeStatus_ModelValidationFail);
                         cnt = false;
                     }
                 }
 
-                if (cnt) {
-                    getData = Repository.Find (i => i.Id == args.Param.Id);
-                    if (getData == null) {
-                        rtn = rtn.SendError (UserErrorsEnum.ChangeStatusDataNotFound);
+                if (cnt)
+                {
+                    getData = Repository.Find(i => i.Id == args.Param.Id);
+                    if (getData == null)
+                    {
+                        rtn = rtn.SendError(UserErrorsEnum.ChangeStatus_DataNotFound);
                         cnt = false;
                     }
                 }
 
-                if (cnt) {
+                if (cnt)
+                {
                     getData.Status = args.Param.Status;
                     getData.UpdatingDate = DateTime.Now;
                     getData.UpdatingUserId = args.UserId;
-                    getData = Repository.Update (getData);
-                    Repository.Save ();
+                    getData = Repository.Update(getData);
+                    Repository.Save();
                 }
 
-                if (cnt) {
-                    tokens = _tokenRepository.FindAll (i => i.UserId == args.Param.Id);
-                    if (tokens.Any ()) {
-                        foreach (var token in tokens) {
+                if (cnt)
+                {
+                    tokens = _tokenRepository.FindAll(i => i.UserId == args.Param.Id);
+                    if (tokens.Any())
+                    {
+                        foreach (var token in tokens)
+                        {
                             token.Status = false;
                             token.UpdatingDate = DateTime.Now;
                             token.UpdatingUserId = args.UserId;
-                            _tokenRepository.Update (token);
+                            _tokenRepository.Update(token);
                         }
-                        _tokenRepository.Save ();
+                        _tokenRepository.Save();
                     }
                 }
 
-                if (cnt) {
-                    HubSyncDataService.OnSync (new HubSyncDataModel<int> {
+                if (cnt)
+                {
+                    _hubSyncDataService.OnSync(new HubSyncDataModel<int>
+                    {
                         Key = "UserManagement_User",
                         ProcessType = "remove",
                         Id = args.Param.Id,
@@ -942,21 +1242,27 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region After Event Handler
 
-                if (cnt) {
-                    afterEventParameterModel = new AfterEventParameterModel<IReturnModel<bool>, ServiceParamsWithIdentifier<ChangeStatusModel>> {
+                if (cnt)
+                {
+                    afterEventParameterModel = new AfterEventParameterModel<IReturnModel<bool>, ServiceParamsWithIdentifier<ChangeStatusModel>>
+                    {
                         DataToBeSent = rtn,
                         ActionParameter = args,
                         ModuleName = ModuleName,
                         ServiceName = ServiceName,
                         ActionName = "ChangeStatus"
                     };
-                    afterEventHandler = EventService.GetEvent (ModuleName, $"{ServiceName}.ChangeStatus.After")
-                        .EventHandler<bool, IAfterEventParameterModel<IReturnModel<bool>, ServiceParamsWithIdentifier<ChangeStatusModel>>> (afterEventParameterModel);
-                    if (afterEventHandler != null) {
-                        if (afterEventHandler.ErrorInfo.Status) {
-                            rtn.ErrorInfo = afterEventHandler.ErrorInfo;
+                    afterEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.ChangeStatus.After")
+                        .EventHandler<bool, IAfterEventParameterModel<IReturnModel<bool>, ServiceParamsWithIdentifier<ChangeStatusModel>>>(afterEventParameterModel);
+                    if (afterEventHandler != null)
+                    {
+                        if (afterEventHandler.Error.Status)
+                        {
+                            rtn.Error = afterEventHandler.Error;
                             cnt = false;
-                        } else {
+                        }
+                        else
+                        {
                             rtn.Result = afterEventHandler.Result;
                         }
                     }
@@ -975,20 +1281,24 @@ namespace CSBEF.Module.UserManagement.Services {
                 tokens = null;
 
                 #endregion Clear Memory
-            } catch (CustomException ex) {
-                rtn = rtn.SendError (GlobalError.TechnicalError, ex);
+            }
+            catch (Exception ex)
+            {
+                rtn = rtn.SendError(GlobalErrors.TechnicalError, ex);
             }
 
             return rtn;
         }
 
-        public IReturnModel<bool> SaveUserInGroups (ServiceParamsWithIdentifier<SaveUserInGroupsModel> args) {
+        public IReturnModel<bool> SaveUserInGroups(ServiceParamsWithIdentifier<SaveUserInGroupsModel> args)
+        {
             if (args == null)
-                throw new ArgumentNullException (nameof (args));
+                throw new ArgumentNullException(nameof(args));
 
-            IReturnModel<bool> rtn = new ReturnModel<bool> (Logger);
+            IReturnModel<bool> rtn = new ReturnModel<bool>(_logger);
 
-            try {
+            try
+            {
                 #region Variables
 
                 bool cnt = true;
@@ -1005,10 +1315,12 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region Before Event Handler
 
-                beforeEventHandler = EventService.GetEvent (ModuleName, $"{ServiceName}.SaveUserInGroups.Before").EventHandler<bool, ServiceParamsWithIdentifier<SaveUserInGroupsModel>> (args);
-                if (beforeEventHandler != null) {
-                    if (beforeEventHandler.ErrorInfo.Status) {
-                        rtn.ErrorInfo = beforeEventHandler.ErrorInfo;
+                beforeEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.SaveUserInGroups.Before").EventHandler<bool, ServiceParamsWithIdentifier<SaveUserInGroupsModel>>(args);
+                if (beforeEventHandler != null)
+                {
+                    if (beforeEventHandler.Error.Status)
+                    {
+                        rtn.Error = beforeEventHandler.Error;
                         cnt = false;
                     }
                 }
@@ -1017,63 +1329,76 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region Action Body
 
-                if (cnt) {
-                    modelValidation = args.Param.ModelValidation ();
+                if (cnt)
+                {
+                    modelValidation = args.Param.ModelValidation();
 
-                    if (modelValidation.Any ()) {
-                        rtn = rtn.SendError (UserErrorsEnum.SaveUserInGroupsModelValidationFail);
+                    if (modelValidation.Any())
+                    {
+                        rtn = rtn.SendError(UserErrorsEnum.SaveUserInGroups_ModelValidationFail);
                         cnt = false;
                     }
                 }
 
-                if (cnt) {
-                    items = _userInGroupRepository.FindAll (i => i.UserId == args.Param.UserId);
-                    if (items.Any ()) {
-                        foreach (var item in items) {
-                            _userInGroupRepository.Delete (item);
+                if (cnt)
+                {
+                    items = _userInGroupRepository.FindAll(i => i.UserId == args.Param.UserId);
+                    if (items.Any())
+                    {
+                        foreach (var item in items)
+                        {
+                            _userInGroupRepository.Delete(item);
                         }
 
-                        _userInGroupRepository.Save ();
+                        _userInGroupRepository.Save();
                     }
 
-                    groupsArray = args.Param.Groups.Split (",");
+                    groupsArray = args.Param.Groups.Split(",");
 
-                    if (groupsArray.Any ()) {
-                        foreach (var group in groupsArray) {
-                            var convertIntGroup = group.ToInt (0);
-                            if (convertIntGroup > 0) {
-                                _userInGroupRepository.Add (new UserInGroup {
+                    if (groupsArray.Any())
+                    {
+                        foreach (var group in groupsArray)
+                        {
+                            var convertIntGroup = group.ToInt(0);
+                            if (convertIntGroup > 0)
+                            {
+                                _userInGroupRepository.Add(new UserInGroup
+                                {
                                     UserId = args.Param.UserId,
-                                        GroupId = convertIntGroup,
-                                        Status = true,
-                                        AddingDate = DateTime.Now,
-                                        UpdatingDate = DateTime.Now,
-                                        AddingUserId = args.UserId,
-                                        UpdatingUserId = args.UserId
+                                    GroupId = convertIntGroup,
+                                    Status = true,
+                                    AddingDate = DateTime.Now,
+                                    UpdatingDate = DateTime.Now,
+                                    AddingUserId = args.UserId,
+                                    UpdatingUserId = args.UserId
                                 });
                             }
                         }
 
-                        _userInGroupRepository.Save ();
+                        _userInGroupRepository.Save();
                     }
 
-                    tokens = _tokenRepository.FindAll (i => i.UserId == args.Param.UserId);
-                    if (tokens.Any ()) {
-                        foreach (var token in tokens) {
+                    tokens = _tokenRepository.FindAll(i => i.UserId == args.Param.UserId);
+                    if (tokens.Any())
+                    {
+                        foreach (var token in tokens)
+                        {
                             token.Status = false;
                             token.UpdatingDate = DateTime.Now;
                             token.UpdatingUserId = args.UserId;
-                            _tokenRepository.Update (token);
+                            _tokenRepository.Update(token);
                         }
 
-                        _userInGroupRepository.Save ();
+                        _userInGroupRepository.Save();
                     }
                 }
 
-                if (cnt) {
-                    userDetails = GetUserDetails (args.Param.UserId);
+                if (cnt)
+                {
+                    userDetails = GetUserDetails(args.Param.UserId);
 
-                    HubSyncDataService.OnSync (new HubSyncDataModel<UserDetailsModel> {
+                    _hubSyncDataService.OnSync(new HubSyncDataModel<UserDetailsModel>
+                    {
                         Key = "UserManagement_User",
                         ProcessType = "update",
                         Id = args.Param.UserId,
@@ -1089,21 +1414,27 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region After Event Handler
 
-                if (cnt) {
-                    afterEventParameterModel = new AfterEventParameterModel<IReturnModel<bool>, ServiceParamsWithIdentifier<SaveUserInGroupsModel>> {
+                if (cnt)
+                {
+                    afterEventParameterModel = new AfterEventParameterModel<IReturnModel<bool>, ServiceParamsWithIdentifier<SaveUserInGroupsModel>>
+                    {
                         DataToBeSent = rtn,
                         ActionParameter = args,
                         ModuleName = ModuleName,
                         ServiceName = ServiceName,
                         ActionName = "SaveUserInGroups"
                     };
-                    afterEventHandler = EventService.GetEvent (ModuleName, $"{ServiceName}.SaveUserInGroups.After")
-                        .EventHandler<bool, IAfterEventParameterModel<IReturnModel<bool>, ServiceParamsWithIdentifier<SaveUserInGroupsModel>>> (afterEventParameterModel);
-                    if (afterEventHandler != null) {
-                        if (afterEventHandler.ErrorInfo.Status) {
-                            rtn.ErrorInfo = afterEventHandler.ErrorInfo;
+                    afterEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.SaveUserInGroups.After")
+                        .EventHandler<bool, IAfterEventParameterModel<IReturnModel<bool>, ServiceParamsWithIdentifier<SaveUserInGroupsModel>>>(afterEventParameterModel);
+                    if (afterEventHandler != null)
+                    {
+                        if (afterEventHandler.Error.Status)
+                        {
+                            rtn.Error = afterEventHandler.Error;
                             cnt = false;
-                        } else {
+                        }
+                        else
+                        {
                             rtn.Result = afterEventHandler.Result;
                         }
                     }
@@ -1123,20 +1454,24 @@ namespace CSBEF.Module.UserManagement.Services {
                 userDetails = null;
 
                 #endregion Clear Memory
-            } catch (CustomException ex) {
-                rtn = rtn.SendError (GlobalError.TechnicalError, ex);
+            }
+            catch (Exception ex)
+            {
+                rtn = rtn.SendError(GlobalErrors.TechnicalError, ex);
             }
 
             return rtn;
         }
 
-        public IReturnModel<bool> SaveUserInRoles (ServiceParamsWithIdentifier<SaveUserInRolesModel> args) {
+        public IReturnModel<bool> SaveUserInRoles(ServiceParamsWithIdentifier<SaveUserInRolesModel> args)
+        {
             if (args == null)
-                throw new ArgumentNullException (nameof (args));
+                throw new ArgumentNullException(nameof(args));
 
-            IReturnModel<bool> rtn = new ReturnModel<bool> (Logger);
+            IReturnModel<bool> rtn = new ReturnModel<bool>(_logger);
 
-            try {
+            try
+            {
                 #region Variables
 
                 bool cnt = true;
@@ -1153,10 +1488,12 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region Before Event Handler
 
-                beforeEventHandler = EventService.GetEvent (ModuleName, $"{ServiceName}.SaveUserInRoles.Before").EventHandler<bool, ServiceParamsWithIdentifier<SaveUserInRolesModel>> (args);
-                if (beforeEventHandler != null) {
-                    if (beforeEventHandler.ErrorInfo.Status) {
-                        rtn.ErrorInfo = beforeEventHandler.ErrorInfo;
+                beforeEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.SaveUserInRoles.Before").EventHandler<bool, ServiceParamsWithIdentifier<SaveUserInRolesModel>>(args);
+                if (beforeEventHandler != null)
+                {
+                    if (beforeEventHandler.Error.Status)
+                    {
+                        rtn.Error = beforeEventHandler.Error;
                         cnt = false;
                     }
                 }
@@ -1165,63 +1502,76 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region Action Body
 
-                if (cnt) {
-                    modelValidation = args.Param.ModelValidation ();
+                if (cnt)
+                {
+                    modelValidation = args.Param.ModelValidation();
 
-                    if (modelValidation.Any ()) {
-                        rtn = rtn.SendError (UserErrorsEnum.SaveUserInRolesModelValidationFail);
+                    if (modelValidation.Any())
+                    {
+                        rtn = rtn.SendError(UserErrorsEnum.SaveUserInRoles_ModelValidationFail);
                         cnt = false;
                     }
                 }
 
-                if (cnt) {
-                    items = _userInRoleRepository.FindAll (i => i.UserId == args.Param.UserId);
-                    if (items.Any ()) {
-                        foreach (var item in items) {
-                            _userInRoleRepository.Delete (item);
+                if (cnt)
+                {
+                    items = _userInRoleRepository.FindAll(i => i.UserId == args.Param.UserId);
+                    if (items.Any())
+                    {
+                        foreach (var item in items)
+                        {
+                            _userInRoleRepository.Delete(item);
                         }
 
-                        _userInRoleRepository.Save ();
+                        _userInRoleRepository.Save();
                     }
 
-                    rolesArray = args.Param.Roles.Split (",");
+                    rolesArray = args.Param.Roles.Split(",");
 
-                    if (rolesArray.Any ()) {
-                        foreach (var role in rolesArray) {
-                            var convertIntrole = role.ToInt (0);
-                            if (convertIntrole > 0) {
-                                _userInRoleRepository.Add (new UserInRole {
+                    if (rolesArray.Any())
+                    {
+                        foreach (var role in rolesArray)
+                        {
+                            var convertIntrole = role.ToInt(0);
+                            if (convertIntrole > 0)
+                            {
+                                _userInRoleRepository.Add(new UserInRole
+                                {
                                     UserId = args.Param.UserId,
-                                        RoleId = convertIntrole,
-                                        Status = true,
-                                        AddingDate = DateTime.Now,
-                                        UpdatingDate = DateTime.Now,
-                                        AddingUserId = args.UserId,
-                                        UpdatingUserId = args.UserId
+                                    RoleId = convertIntrole,
+                                    Status = true,
+                                    AddingDate = DateTime.Now,
+                                    UpdatingDate = DateTime.Now,
+                                    AddingUserId = args.UserId,
+                                    UpdatingUserId = args.UserId
                                 });
                             }
                         }
 
-                        _userInRoleRepository.Save ();
+                        _userInRoleRepository.Save();
                     }
 
-                    tokens = _tokenRepository.FindAll (i => i.UserId == args.Param.UserId);
-                    if (tokens.Any ()) {
-                        foreach (var token in tokens) {
+                    tokens = _tokenRepository.FindAll(i => i.UserId == args.Param.UserId);
+                    if (tokens.Any())
+                    {
+                        foreach (var token in tokens)
+                        {
                             token.Status = false;
                             token.UpdatingDate = DateTime.Now;
                             token.UpdatingUserId = args.UserId;
-                            _tokenRepository.Update (token);
+                            _tokenRepository.Update(token);
                         }
 
-                        _userInGroupRepository.Save ();
+                        _userInGroupRepository.Save();
                     }
                 }
 
-                if (cnt) {
-                    userDetails = GetUserDetails (args.Param.UserId);
+                if (cnt)
+                {
+                    userDetails = GetUserDetails(args.Param.UserId);
 
-                    HubSyncDataService.OnSync (new HubSyncDataModel<UserDetailsModel> {
+                    _hubSyncDataService.OnSync(new HubSyncDataModel<UserDetailsModel>
+                    {
                         Key = "UserManagement_User",
                         ProcessType = "update",
                         Id = args.Param.UserId,
@@ -1237,21 +1587,27 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region After Event Handler
 
-                if (cnt) {
-                    afterEventParameterModel = new AfterEventParameterModel<IReturnModel<bool>, ServiceParamsWithIdentifier<SaveUserInRolesModel>> {
+                if (cnt)
+                {
+                    afterEventParameterModel = new AfterEventParameterModel<IReturnModel<bool>, ServiceParamsWithIdentifier<SaveUserInRolesModel>>
+                    {
                         DataToBeSent = rtn,
                         ActionParameter = args,
                         ModuleName = ModuleName,
                         ServiceName = ServiceName,
                         ActionName = "SaveUserInRoles"
                     };
-                    afterEventHandler = EventService.GetEvent (ModuleName, $"{ServiceName}.SaveUserInRoles.After")
-                        .EventHandler<bool, IAfterEventParameterModel<IReturnModel<bool>, ServiceParamsWithIdentifier<SaveUserInRolesModel>>> (afterEventParameterModel);
-                    if (afterEventHandler != null) {
-                        if (afterEventHandler.ErrorInfo.Status) {
-                            rtn.ErrorInfo = afterEventHandler.ErrorInfo;
+                    afterEventHandler = _eventService.GetEvent(ModuleName, $"{ServiceName}.SaveUserInRoles.After")
+                        .EventHandler<bool, IAfterEventParameterModel<IReturnModel<bool>, ServiceParamsWithIdentifier<SaveUserInRolesModel>>>(afterEventParameterModel);
+                    if (afterEventHandler != null)
+                    {
+                        if (afterEventHandler.Error.Status)
+                        {
+                            rtn.Error = afterEventHandler.Error;
                             cnt = false;
-                        } else {
+                        }
+                        else
+                        {
                             rtn.Result = afterEventHandler.Result;
                         }
                     }
@@ -1271,17 +1627,21 @@ namespace CSBEF.Module.UserManagement.Services {
                 userDetails = null;
 
                 #endregion Clear Memory
-            } catch (CustomException ex) {
-                rtn = rtn.SendError (GlobalError.TechnicalError, ex);
+            }
+            catch (Exception ex)
+            {
+                rtn = rtn.SendError(GlobalErrors.TechnicalError, ex);
             }
 
             return rtn;
         }
 
-        private IReturnModel<UserDetailsModel> GetUserDetails (int id) {
-            IReturnModel<UserDetailsModel> rtn = new ReturnModel<UserDetailsModel> (Logger);
+        private IReturnModel<UserDetailsModel> GetUserDetails(int id)
+        {
+            IReturnModel<UserDetailsModel> rtn = new ReturnModel<UserDetailsModel>(_logger);
 
-            try {
+            try
+            {
                 #region Variables
 
                 bool cnt = true;
@@ -1299,48 +1659,59 @@ namespace CSBEF.Module.UserManagement.Services {
 
                 #region Action Body
 
-                getData = Repository.Find (i => i.Id == id);
-                if (getData == null) {
+                getData = Repository.Find(i => i.Id == id);
+                if (getData == null)
+                {
                     cnt = false;
                 }
 
-                if (cnt) {
-                    user = Mapper.Map<UserDTO> (getData);
+                if (cnt)
+                {
+                    user = _mapper.Map<UserDTO>(getData);
                     user.Password = string.Empty;
 
-                    userDetailsModel = new UserDetailsModel {
+                    userDetailsModel = new UserDetailsModel
+                    {
                         User = user
                     };
 
-                    userInGroupData = _userInGroupRepository.FindAll (i => i.UserId == user.Id);
-                    if (userInGroupData.Any ()) {
-                        convertUserInGroupDataDTO = Mapper.Map<List<UserInGroupDTO>> (userInGroupData);
-                        userDetailsModel.InGroups.AddRange (convertUserInGroupDataDTO);
+                    userInGroupData = _userInGroupRepository.FindAll(i => i.UserId == user.Id);
+                    if (userInGroupData.Any())
+                    {
+                        convertUserInGroupDataDTO = _mapper.Map<List<UserInGroupDTO>>(userInGroupData);
+                        userDetailsModel.InGroups.AddRange(convertUserInGroupDataDTO);
 
-                        groupingGroups = convertUserInGroupDataDTO.GroupBy (i => i.GroupId).ToList ();
+                        groupingGroups = convertUserInGroupDataDTO.GroupBy(i => i.GroupId).ToList();
 
-                        foreach (var groupId in groupingGroups) {
-                            groupInRoles = _groupInRoleRepository.FindAll (i => i.GroupId == groupId.Key);
-                            convertedGroupInRoles = Mapper.Map<List<GroupInRoleDTO>> (groupInRoles.ToList ());
-                            if (convertedGroupInRoles.Any ()) {
-                                foreach (var role in convertedGroupInRoles) {
-                                    if (!userDetailsModel.InRoles.Any (i => i.RoleId == role.RoleId))
-                                        userDetailsModel.InRoles.Add (new UserInRoleModel {
+                        foreach (var groupId in groupingGroups)
+                        {
+                            groupInRoles = _groupInRoleRepository.FindAll(i => i.GroupId == groupId.Key);
+                            convertedGroupInRoles = _mapper.Map<List<GroupInRoleDTO>>(groupInRoles.ToList());
+                            if (convertedGroupInRoles.Any())
+                            {
+                                foreach (var role in convertedGroupInRoles)
+                                {
+                                    if (!userDetailsModel.InRoles.Any(i => i.RoleId == role.RoleId))
+                                        userDetailsModel.InRoles.Add(new UserInRoleModel
+                                        {
                                             RoleId = role.RoleId,
-                                                GroupId = groupId.Key
+                                            GroupId = groupId.Key
                                         });
                                 }
                             }
                         }
                     }
 
-                    userInRoles = _userInRoleRepository.FindAll (i => i.UserId == user.Id);
-                    if (userInRoles.Any ()) {
-                        foreach (var inRole in userInRoles) {
-                            if (!userDetailsModel.InRoles.Any (i => i.RoleId == inRole.RoleId && i.GroupId == 0))
-                                userDetailsModel.InRoles.Add (new UserInRoleModel {
+                    userInRoles = _userInRoleRepository.FindAll(i => i.UserId == user.Id);
+                    if (userInRoles.Any())
+                    {
+                        foreach (var inRole in userInRoles)
+                        {
+                            if (!userDetailsModel.InRoles.Any(i => i.RoleId == inRole.RoleId && i.GroupId == 0))
+                                userDetailsModel.InRoles.Add(new UserInRoleModel
+                                {
                                     RoleId = inRole.RoleId,
-                                        GroupId = 0
+                                    GroupId = 0
                                 });
                         }
                     }
@@ -1363,8 +1734,10 @@ namespace CSBEF.Module.UserManagement.Services {
                 userInRoles = null;
 
                 #endregion Clear Memory
-            } catch (CustomException ex) {
-                rtn = rtn.SendError (GlobalError.TechnicalError, ex);
+            }
+            catch (Exception ex)
+            {
+                rtn = rtn.SendError(GlobalErrors.TechnicalError, ex);
             }
 
             return rtn;

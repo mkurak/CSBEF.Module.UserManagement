@@ -1,5 +1,7 @@
-﻿namespace CSBEF.Module.UserManagement.Models.Request {
-    public class CreateTokenModel {
+﻿namespace CSBEF.Module.UserManagement.Models.Request
+{
+    public class CreateTokenModel
+    {
         public string UserName { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
