@@ -1,4 +1,4 @@
-/****** Object:  Table [dbo].[UserManagement_Group]    Script Date: 10.10.2019 05:15:01 ******/
+/****** Object:  Table [dbo].[UserManagement_Group]    Script Date: 17.05.2020 05:19:27 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -17,7 +17,7 @@ CREATE TABLE [dbo].[UserManagement_Group](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[UserManagement_GroupInRole]    Script Date: 10.10.2019 05:15:01 ******/
+/****** Object:  Table [dbo].[UserManagement_GroupInRole]    Script Date: 17.05.2020 05:19:27 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -37,7 +37,7 @@ CREATE TABLE [dbo].[UserManagement_GroupInRole](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[UserManagement_Role]    Script Date: 10.10.2019 05:15:01 ******/
+/****** Object:  Table [dbo].[UserManagement_Role]    Script Date: 17.05.2020 05:19:27 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -58,7 +58,7 @@ CREATE TABLE [dbo].[UserManagement_Role](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[UserManagement_Token]    Script Date: 10.10.2019 05:15:01 ******/
+/****** Object:  Table [dbo].[UserManagement_Token]    Script Date: 17.05.2020 05:19:27 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -82,7 +82,7 @@ CREATE TABLE [dbo].[UserManagement_Token](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[UserManagement_User]    Script Date: 10.10.2019 05:15:01 ******/
+/****** Object:  Table [dbo].[UserManagement_User]    Script Date: 17.05.2020 05:19:27 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -108,7 +108,7 @@ CREATE TABLE [dbo].[UserManagement_User](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[UserManagement_UserInGroup]    Script Date: 10.10.2019 05:15:01 ******/
+/****** Object:  Table [dbo].[UserManagement_UserInGroup]    Script Date: 17.05.2020 05:19:27 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -128,7 +128,7 @@ CREATE TABLE [dbo].[UserManagement_UserInGroup](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[UserManagement_UserInRole]    Script Date: 10.10.2019 05:15:01 ******/
+/****** Object:  Table [dbo].[UserManagement_UserInRole]    Script Date: 17.05.2020 05:19:27 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -148,7 +148,7 @@ CREATE TABLE [dbo].[UserManagement_UserInRole](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[UserManagement_UserMessage]    Script Date: 10.10.2019 05:15:01 ******/
+/****** Object:  Table [dbo].[UserManagement_UserMessage]    Script Date: 17.05.2020 05:19:27 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -171,13 +171,81 @@ CREATE TABLE [dbo].[UserManagement_UserMessage](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Index [IX_UserManagement_UserMessage_FromUserId]    Script Date: 10.10.2019 05:15:01 ******/
+SET IDENTITY_INSERT [dbo].[UserManagement_Group] ON 
+GO
+INSERT [dbo].[UserManagement_Group] ([Id], [GroupName], [Status], [AddingDate], [UpdatingDate], [AddingUserId], [UpdatingUserId]) VALUES (1, N'Administrators', 1, CAST(N'2020-05-15T05:33:30.177' AS DateTime), CAST(N'2020-05-15T05:33:30.177' AS DateTime), 1, 1)
+GO
+SET IDENTITY_INSERT [dbo].[UserManagement_Group] OFF
+GO
+SET IDENTITY_INSERT [dbo].[UserManagement_GroupInRole] ON 
+GO
+INSERT [dbo].[UserManagement_GroupInRole] ([Id], [GroupId], [RoleId], [Status], [AddingDate], [UpdatingDate], [AddingUserId], [UpdatingUserId]) VALUES (1, 1, 1, 1, CAST(N'2020-05-15T05:34:20.670' AS DateTime), CAST(N'2020-05-15T05:34:20.670' AS DateTime), 1, 1)
+GO
+SET IDENTITY_INSERT [dbo].[UserManagement_GroupInRole] OFF
+GO
+SET IDENTITY_INSERT [dbo].[UserManagement_Role] ON 
+GO
+INSERT [dbo].[UserManagement_Role] ([Id], [RoleName], [RoleTitle], [RoleDescription], [Status], [AddingDate], [UpdatingDate], [AddingUserId], [UpdatingUserId]) VALUES (1, N'Root', N'i18n:rolesDefinitions.Root.title', N'i18n:rolesDefinitions.Root.desc', 1, CAST(N'2019-09-01T14:44:13.250' AS DateTime), CAST(N'2019-09-01T14:44:13.250' AS DateTime), 1, 1)
+GO
+INSERT [dbo].[UserManagement_Role] ([Id], [RoleName], [RoleTitle], [RoleDescription], [Status], [AddingDate], [UpdatingDate], [AddingUserId], [UpdatingUserId]) VALUES (2, N'Root.UserManagement', N'i18n:rolesDefinitions.Root_UserManagement.title', N'i18n:rolesDefinitions.Root_UserManagement.desc', 1, CAST(N'2019-09-01T14:44:27.243' AS DateTime), CAST(N'2019-09-01T14:44:27.243' AS DateTime), 1, 1)
+GO
+INSERT [dbo].[UserManagement_Role] ([Id], [RoleName], [RoleTitle], [RoleDescription], [Status], [AddingDate], [UpdatingDate], [AddingUserId], [UpdatingUserId]) VALUES (3, N'Root.UserManagement.User', N'i18n:rolesDefinitions.Root_UserManagement_User.title', N'i18n:rolesDefinitions.Root_UserManagement_User.desc', 1, CAST(N'2019-09-01T14:44:43.483' AS DateTime), CAST(N'2019-09-01T14:44:43.483' AS DateTime), 1, 1)
+GO
+INSERT [dbo].[UserManagement_Role] ([Id], [RoleName], [RoleTitle], [RoleDescription], [Status], [AddingDate], [UpdatingDate], [AddingUserId], [UpdatingUserId]) VALUES (4, N'Root.UserManagement.User.List', N'i18n:rolesDefinitions.Root_UserManagement_User_List.title', N'i18n:rolesDefinitions.Root_UserManagement_User_List.desc', 1, CAST(N'2019-09-01T14:45:02.440' AS DateTime), CAST(N'2019-09-01T14:45:02.440' AS DateTime), 1, 1)
+GO
+INSERT [dbo].[UserManagement_Role] ([Id], [RoleName], [RoleTitle], [RoleDescription], [Status], [AddingDate], [UpdatingDate], [AddingUserId], [UpdatingUserId]) VALUES (5, N'Root.UserManagement.User.Add', N'i18n:rolesDefinitions.Root_UserManagement_User_Add.title', N'i18n:rolesDefinitions.Root_UserManagement_User_Add.desc', 1, CAST(N'2019-09-01T14:45:13.667' AS DateTime), CAST(N'2019-09-01T14:45:13.667' AS DateTime), 1, 1)
+GO
+INSERT [dbo].[UserManagement_Role] ([Id], [RoleName], [RoleTitle], [RoleDescription], [Status], [AddingDate], [UpdatingDate], [AddingUserId], [UpdatingUserId]) VALUES (6, N'Root.UserManagement.User.Update', N'i18n:rolesDefinitions.Root_UserManagement_User_Update.title', N'i18n:rolesDefinitions.Root_UserManagement_User_Update.desc', 1, CAST(N'2019-09-01T14:45:25.590' AS DateTime), CAST(N'2019-09-01T14:45:25.590' AS DateTime), 1, 1)
+GO
+INSERT [dbo].[UserManagement_Role] ([Id], [RoleName], [RoleTitle], [RoleDescription], [Status], [AddingDate], [UpdatingDate], [AddingUserId], [UpdatingUserId]) VALUES (7, N'Root.UserManagement.User.ChangeStatus', N'i18n:rolesDefinitions.Root_UserManagement_User_ChangeStatus.title', N'i18n:rolesDefinitions.Root_UserManagement_User_ChangeStatus.desc', 1, CAST(N'2019-09-01T14:45:38.100' AS DateTime), CAST(N'2019-09-01T14:45:38.100' AS DateTime), 1, 1)
+GO
+INSERT [dbo].[UserManagement_Role] ([Id], [RoleName], [RoleTitle], [RoleDescription], [Status], [AddingDate], [UpdatingDate], [AddingUserId], [UpdatingUserId]) VALUES (8, N'Root.UserManagement.User.ChangeRoles', N'i18n:rolesDefinitions.Root_UserManagement_User_ChangeRoles.title', N'i18n:rolesDefinitions.Root_UserManagement_User_ChangeRoles.desc', 1, CAST(N'2019-09-01T14:45:51.653' AS DateTime), CAST(N'2019-09-01T14:45:51.653' AS DateTime), 1, 1)
+GO
+INSERT [dbo].[UserManagement_Role] ([Id], [RoleName], [RoleTitle], [RoleDescription], [Status], [AddingDate], [UpdatingDate], [AddingUserId], [UpdatingUserId]) VALUES (9, N'Root.UserManagement.User.UserInGroup', N'i18n:rolesDefinitions.Root_UserManagement_User_UserInGroup.title', N'i18n:rolesDefinitions.Root_UserManagement_User_UserInGroup.desc', 1, CAST(N'2019-09-01T14:46:08.357' AS DateTime), CAST(N'2019-09-01T14:46:08.357' AS DateTime), 1, 1)
+GO
+INSERT [dbo].[UserManagement_Role] ([Id], [RoleName], [RoleTitle], [RoleDescription], [Status], [AddingDate], [UpdatingDate], [AddingUserId], [UpdatingUserId]) VALUES (10, N'Root.UserManagement.Group', N'i18n:rolesDefinitions.Root_UserManagement_Group.title', N'i18n:rolesDefinitions.Root_UserManagement_Group.desc', 1, CAST(N'2019-09-01T14:46:23.440' AS DateTime), CAST(N'2019-09-01T14:46:23.440' AS DateTime), 1, 1)
+GO
+INSERT [dbo].[UserManagement_Role] ([Id], [RoleName], [RoleTitle], [RoleDescription], [Status], [AddingDate], [UpdatingDate], [AddingUserId], [UpdatingUserId]) VALUES (11, N'Root.UserManagement.Group.List', N'i18n:rolesDefinitions.Root_UserManagement_Group_List.title', N'i18n:rolesDefinitions.Root_UserManagement_Group_List.desc', 1, CAST(N'2019-09-01T14:46:34.310' AS DateTime), CAST(N'2019-09-01T14:46:34.310' AS DateTime), 1, 1)
+GO
+INSERT [dbo].[UserManagement_Role] ([Id], [RoleName], [RoleTitle], [RoleDescription], [Status], [AddingDate], [UpdatingDate], [AddingUserId], [UpdatingUserId]) VALUES (12, N'Root.UserManagement.Group.Add', N'i18n:rolesDefinitions.Root_UserManagement_Group_Add.title', N'i18n:rolesDefinitions.Root_UserManagement_Group_Add.desc', 1, CAST(N'2019-09-01T14:46:44.510' AS DateTime), CAST(N'2019-09-01T14:46:44.510' AS DateTime), 1, 1)
+GO
+INSERT [dbo].[UserManagement_Role] ([Id], [RoleName], [RoleTitle], [RoleDescription], [Status], [AddingDate], [UpdatingDate], [AddingUserId], [UpdatingUserId]) VALUES (13, N'Root.UserManagement.Group.Update', N'i18n:rolesDefinitions.Root_UserManagement_Group_Update.title', N'i18n:rolesDefinitions.Root_UserManagement_Group_Update.desc', 1, CAST(N'2019-09-01T14:46:54.753' AS DateTime), CAST(N'2019-09-01T14:46:54.753' AS DateTime), 1, 1)
+GO
+INSERT [dbo].[UserManagement_Role] ([Id], [RoleName], [RoleTitle], [RoleDescription], [Status], [AddingDate], [UpdatingDate], [AddingUserId], [UpdatingUserId]) VALUES (14, N'Root.UserManagement.Group.ChangeStatus', N'i18n:rolesDefinitions.Root_UserManagement_Group_ChangeStatus.title', N'i18n:rolesDefinitions.Root_UserManagement_Group_ChangeStatus.desc', 1, CAST(N'2019-09-01T14:47:04.647' AS DateTime), CAST(N'2019-09-01T14:47:04.647' AS DateTime), 1, 1)
+GO
+INSERT [dbo].[UserManagement_Role] ([Id], [RoleName], [RoleTitle], [RoleDescription], [Status], [AddingDate], [UpdatingDate], [AddingUserId], [UpdatingUserId]) VALUES (15, N'Root.UserManagement.Group.ChangeRoles', N'i18n:rolesDefinitions.Root_UserManagement_Group_ChangeRoles.title', N'i18n:rolesDefinitions.Root_UserManagement_Group_ChangeRoles.desc', 1, CAST(N'2019-09-01T14:47:32.800' AS DateTime), CAST(N'2019-09-01T14:47:32.800' AS DateTime), 1, 1)
+GO
+INSERT [dbo].[UserManagement_Role] ([Id], [RoleName], [RoleTitle], [RoleDescription], [Status], [AddingDate], [UpdatingDate], [AddingUserId], [UpdatingUserId]) VALUES (16, N'Root.UserManagement.Role', N'i18n:rolesDefinitions.Root_UserManagement_Role.title', N'i18n:rolesDefinitions.Root_UserManagement_Role.desc', 1, CAST(N'2019-09-01T14:47:46.273' AS DateTime), CAST(N'2019-09-01T14:47:46.273' AS DateTime), 1, 1)
+GO
+INSERT [dbo].[UserManagement_Role] ([Id], [RoleName], [RoleTitle], [RoleDescription], [Status], [AddingDate], [UpdatingDate], [AddingUserId], [UpdatingUserId]) VALUES (17, N'Root.UserManagement.Role.List', N'i18n:rolesDefinitions.Root_UserManagement_Role_List.title', N'i18n:rolesDefinitions.Root_UserManagement_Role_List.desc', 1, CAST(N'2019-09-01T14:47:57.763' AS DateTime), CAST(N'2019-09-01T14:47:57.763' AS DateTime), 1, 1)
+GO
+SET IDENTITY_INSERT [dbo].[UserManagement_Role] OFF
+GO
+SET IDENTITY_INSERT [dbo].[UserManagement_Token] ON 
+GO
+INSERT [dbo].[UserManagement_Token] ([Id], [UserId], [NotificationToken], [TokenCode], [ExpiredDate], [Device], [DeviceKey], [Status], [AddingDate], [UpdatingDate], [AddingUserId], [UpdatingUserId]) VALUES (1, 1, NULL, N'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjEiLCJlbWFpbCI6InRlc3R1c2VyQGNvZGVzY2llbnRpZmljLmNvbSIsImdpdmVuX25hbWUiOiJFa29Gb29kVnVlQXBwIiwiY2VydHNlcmlhbG51bWJlciI6IkVrb0Zvb2RWdWVBcHAiLCJVc2VyTmFtZSI6IlRlc3QiLCJVc2VyU3VybmFtZSI6IlVzZXIiLCJQcm9maWxlUGljIjoiZGVmYXVsdC5qcGciLCJQcm9maWxlQmdQaWMiOiJkZWZhdWx0LmpwZyIsIlByb2ZpbGVTdGF0dXNNZXNzYWdlIjoiSGVsbG8gV29ybGQhIiwiVG9rZW5JZCI6IjEiLCJyb2xlIjoiUm9vdCIsIm5iZiI6MTU4OTUxMjA5OCwiZXhwIjoxNjIxMDQ4MDk4LCJpYXQiOjE1ODk1MTIwOTgsImlzcyI6IkpXVC5DU0JFRiIsImF1ZCI6IkNTQkVGIn0.zAclF2O-ANJHdt_aRyN0-L1wce2mDg3sXrW8STSABDo', CAST(N'2021-05-15T03:08:18.487' AS DateTime), N'EkoFoodVueApp', N'EkoFoodVueApp', 1, CAST(N'2020-05-15T06:08:18.487' AS DateTime), CAST(N'2020-05-15T06:08:18.487' AS DateTime), 1, 1)
+GO
+SET IDENTITY_INSERT [dbo].[UserManagement_Token] OFF
+GO
+SET IDENTITY_INSERT [dbo].[UserManagement_User] ON 
+GO
+INSERT [dbo].[UserManagement_User] ([Id], [Name], [Surname], [ProfilePic], [ProfileBgPic], [ProfileStatusMessage], [UserName], [Email], [Password], [Status], [AddingDate], [UpdatingDate], [AddingUserId], [UpdatingUserId]) VALUES (1, N'Test', N'User', N'default.jpg', N'default.jpg', N'Hello World!', N'testuser', N'testuser@codescientific.com', N'53FF9CE839143638049B9C83D9F1500F2D929154', 1, CAST(N'2020-05-15T05:33:07.930' AS DateTime), CAST(N'2020-05-15T05:33:07.930' AS DateTime), 1, 1)
+GO
+SET IDENTITY_INSERT [dbo].[UserManagement_User] OFF
+GO
+SET IDENTITY_INSERT [dbo].[UserManagement_UserInGroup] ON 
+GO
+INSERT [dbo].[UserManagement_UserInGroup] ([Id], [UserId], [GroupId], [Status], [AddingDate], [UpdatingDate], [AddingUserId], [UpdatingUserId]) VALUES (1, 1, 1, 1, CAST(N'2020-05-15T05:34:33.830' AS DateTime), CAST(N'2020-05-15T05:34:33.830' AS DateTime), 1, 1)
+GO
+SET IDENTITY_INSERT [dbo].[UserManagement_UserInGroup] OFF
+GO
+/****** Object:  Index [IX_UserManagement_UserMessage_FromUserId]    Script Date: 17.05.2020 05:19:27 ******/
 CREATE NONCLUSTERED INDEX [IX_UserManagement_UserMessage_FromUserId] ON [dbo].[UserManagement_UserMessage]
 (
 	[FromUserId] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 GO
-/****** Object:  Index [IX_UserManagement_UserMessage_ToUserId]    Script Date: 10.10.2019 05:15:01 ******/
+/****** Object:  Index [IX_UserManagement_UserMessage_ToUserId]    Script Date: 17.05.2020 05:19:27 ******/
 CREATE NONCLUSTERED INDEX [IX_UserManagement_UserMessage_ToUserId] ON [dbo].[UserManagement_UserMessage]
 (
 	[ToUserId] ASC
