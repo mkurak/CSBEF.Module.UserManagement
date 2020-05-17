@@ -4,11 +4,10 @@
 It is a user management module developed for CSBEF structure.
 
 # Current Version
-Release: 3.1.2 ([latest release](https://github.com/mkurak/CSBEF.Module.UserManagement/releases/tag/3.1.2))
+Release: 3.1.3 ([latest release](https://github.com/mkurak/CSBEF.Module.UserManagement/releases/tag/3.1.3))
 
 # Version Info
-- Since the requests from structural changes in versions 3.1.0 and 3.1.1 were abandoned, version 1.2.4 was returned and updates were made.
-- CSBEF.Core upgraded.
+Updated CSBEF.Core Dependency (3.1.3)
 
 # Nuget
 ([CSBEF.Module.UserManagement](https://www.nuget.org/packages/CSBEF.Module.UserManagement/))
