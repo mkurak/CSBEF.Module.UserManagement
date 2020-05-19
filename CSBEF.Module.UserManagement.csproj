@@ -12,8 +12,9 @@
     <RepositoryUrl>https://github.com/mkurak/CSBEF.Module.UserManagement</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
     <PackageTags>CSBEF User Management Module (official)</PackageTags>
-    <Version>3.1.3</Version>
-    <PackageReleaseNotes>Updated CSBEF.Core Dependency (3.1.3)</PackageReleaseNotes>
+    <Version>3.1.4</Version>
+    <PackageReleaseNotes>- Fixed the issue of saving passively while registering the user
+- Fixed a typo in the default status message when registering the new user</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
