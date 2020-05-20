@@ -4,11 +4,10 @@
 It is a user management module developed for CSBEF structure.
 
 # Current Version
-Release: 3.1.4 ([latest release](https://github.com/mkurak/CSBEF.Module.UserManagement/releases/tag/3.1.4))
+Release: 3.1.5 ([latest release](https://github.com/mkurak/CSBEF.Module.UserManagement/releases/tag/3.1.5))
 
 # Version Info
-- Fixed the issue of saving passively while registering the user
-- Fixed a typo in the default status message when registering the new user
+- Users' last message sending information has been corrected.
 
 # Nuget
 ([CSBEF.Module.UserManagement](https://www.nuget.org/packages/CSBEF.Module.UserManagement/))

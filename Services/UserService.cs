@@ -591,7 +591,7 @@ namespace CSBEF.Module.UserManagement.Services
                         messages = _userMessageRepository.FindAll(i => (i.FromUserId == user.Id && i.ToUserId == getUser.Id) || (i.ToUserId == user.Id && i.FromUserId == getUser.Id));
                         if (messages.Any())
                         {
-                            var lastMessage = messages.Where(i => i.FromUserId == user.Id).OrderByDescending(i => i.AddingDate).FirstOrDefault();
+                            var lastMessage = messages.OrderByDescending(i => i.AddingDate).FirstOrDefault();
                             if (lastMessage != null)
                                 user.LastMessage = lastMessage.AddingDate;
 
