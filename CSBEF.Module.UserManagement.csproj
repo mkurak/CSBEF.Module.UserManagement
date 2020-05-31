@@ -12,8 +12,8 @@
     <RepositoryUrl>https://github.com/mkurak/CSBEF.Module.UserManagement</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
     <PackageTags>CSBEF User Management Module (official)</PackageTags>
-    <Version>3.1.6</Version>
-    <PackageReleaseNotes>Updated CSBEF.Core (3.1.4)</PackageReleaseNotes>
+    <Version>3.1.7</Version>
+    <PackageReleaseNotes>Updated CSBEF.Core (3.1.5)</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CSBEF.Core" Version="3.1.4" />
+    <PackageReference Include="CSBEF.Core" Version="3.1.5" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
