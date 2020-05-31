@@ -4,10 +4,10 @@
 It is a user management module developed for CSBEF structure.
 
 # Current Version
-Release: 3.1.5 ([latest release](https://github.com/mkurak/CSBEF.Module.UserManagement/releases/tag/3.1.5))
+Release: 3.1.6 ([latest release](https://github.com/mkurak/CSBEF.Module.UserManagement/releases/tag/3.1.6))
 
 # Version Info
-- Users' last message sending information has been corrected.
+- Updated CSBEF.Core (3.1.4)
 
 # Nuget
 ([CSBEF.Module.UserManagement](https://www.nuget.org/packages/CSBEF.Module.UserManagement/))
